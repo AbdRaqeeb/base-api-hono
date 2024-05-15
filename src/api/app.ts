@@ -6,6 +6,7 @@ import { createRepositories } from '../repositories';
 import * as services from '../services';
 import * as lib from '../lib';
 import * as httpServices from '../api';
+import project from '../project';
 
 const startNewApplication = (): Application => {
     const app = express();
@@ -30,7 +31,7 @@ const startNewApplication = (): Application => {
     app.use(logRequestMiddleware());
 
     app.get('/', (req: Request, res: Response) => {
-        return res.status(200).json({ message: 'Welcome to alifhub api' });
+        return res.status(200).json({ message: `Welcome to ${project.name}` });
     });
 
     return app;
