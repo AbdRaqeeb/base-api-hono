@@ -141,8 +141,11 @@ export const bodyParser = createMiddleware(async (context: Context, next: Next) 
     // Only parse POST, PUT, PATCH requests
     const isAllowedMethod = ['POST', 'PUT', 'PATCH'].includes(context.req.method);
     const isJSON = context.req.header('content-type')?.includes('application/json');
+
     if (!isAllowedMethod || !isJSON) {
-        return next();
+        context.set('body', {});
+        await next();
+        return;
     }
 
     try {
@@ -151,6 +154,7 @@ export const bodyParser = createMiddleware(async (context: Context, next: Next) 
     } catch (error) {
         const err = error instanceof Error ? error : new Error('Failed to parse JSON body');
         logger.error(err, '[BodyParser]');
+
         context.set('body', {});
     }
 

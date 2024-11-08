@@ -69,7 +69,7 @@ export function logRequestMiddleware() {
         logger.request(requestId, {
             route: context.req.path,
             url: context.req.url,
-            body: context.req.json(),
+            body: context.get('body'),
             query: context.req.query(),
             params: context.req.param(),
             headers: context.req.header(),

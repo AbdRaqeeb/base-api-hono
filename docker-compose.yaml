@@ -1,0 +1,14 @@
+services:
+  hono-api:
+    container_name: hono-api
+    image: base-hono-api:latest
+    env_file:
+      - .env.docker
+    networks:
+      - pg
+    ports:
+      - '8765:8765'
+
+networks:
+  pg:
+    external: true

@@ -24,15 +24,15 @@ const startNewApplication = () => {
     // set request id
     app.use('*', requestId());
 
-    // log request
-    app.use(logRequestMiddleware());
-
     // parse json
     app.use(lib.bodyParser);
 
-    app.get('/', (c) => {
-        c.status(HttpStatusCode.Ok);
-        return c.json({ message: `Welcome to ${project.name}` });
+    // log request
+    app.use(logRequestMiddleware());
+
+    app.get('/', (context) => {
+        context.status(HttpStatusCode.Ok);
+        return context.json({ message: `Welcome to ${project.name}` });
     });
 
     return { app, factory, router };

@@ -42,13 +42,13 @@ You can use node version manager (`nvm`) to use multiple node versions on your s
 Install dependencies
 
 ```bash
-  yarn install
+  bun install
 ```
 
 Start the server in development mode
 
 ```bash
-  yarn dev
+  bun dev
 ```
 
 Start the server in production mode
@@ -56,13 +56,13 @@ Start the server in production mode
 Build
 
 ```bash
-    yarn build
+    bun build
 ```
 
 Start
 
 ```bash
-    yarn start
+    bun start
 ```
 
 ## Running Tests
@@ -82,11 +82,11 @@ Copy the variables in the `.env.example` into the `.env` file and fill with test
 Test
 
 ```bash
-  yarn test
+  bun test
 ```
 
 Test Coverage
 
 ```bash
-    yarn test:coverage
+    bun test:coverage
 ```

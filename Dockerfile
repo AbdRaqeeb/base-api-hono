@@ -1,43 +1,25 @@
 # Stage 1: Build environment
-FROM node:20.12.2-alpine3.18 AS build
+FROM oven/bun:1.1.34-alpine AS base
+WORKDIR /usr/src/app
 
-# add curl and bash
-RUN apk update && apk add yarn curl bash && rm -rf /var/cache/apk/*
+FROM base AS install
+RUN mkdir -p /temp/dev
+COPY package.json bun.lockb  /temp/dev/
+RUN cd /temp/dev && bun install --frozen-lockfile --ignore-scripts
 
-# install node-prune (https://github.com/tj/node-prune)
-RUN curl -sf https://gobinaries.com/tj/node-prune | sh
+# copy node_modules from temp directory
+# then copy all (non-ignored) project files into the image
+FROM base AS prerelease
+COPY --from=install /temp/dev/node_modules node_modules
+COPY ./src ./src
+COPY package.json .
 
-RUN mkdir /app/
+# copy production dependencies and source code into final image
+FROM base AS release
+COPY --from=install /temp/dev/node_modules node_modules
+COPY --from=prerelease /usr/src/app/src ./src
+COPY --from=prerelease /usr/src/app/package.json .
 
-# Set the working directory in the container
-WORKDIR /app/
-
-COPY package.json yarn.lock tsconfig.json ./
-
-# install dependencies
-RUN yarn install --ignore-scripts
-
-COPY . /app
-
-# build the app
-RUN yarn build
-
-# run node prune
-RUN node-prune
-
-FROM node:20.12.2-alpine3.18
-
-RUN mkdir /app/
-
-# Set the working directory in the container
-WORKDIR /app/
-
-# Copy built files from the previous stage
-COPY --from=build /app/package.json ./
-COPY --from=build /app/yarn.lock ./
-COPY --from=build /app/dist /app/dist
-COPY --from=build /app/node_modules ./node_modules
-
-EXPOSE 6050
-
-CMD ["yarn", "start"]
+# run the app
+USER bun
+ENTRYPOINT [ "bun", "run", "src/index.ts" ]
