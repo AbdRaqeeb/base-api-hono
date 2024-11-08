@@ -12,7 +12,7 @@ brevoInstance.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, Config
 export function getTemplateId(email_type: EmailTypes) {
     /* SET EMAIL TEMPLATES ID FROM BREVO */
     switch (email_type) {
-        case EmailTypes.ConfirmEmail:
+        case EmailTypes.VerifyEmail:
             return 0;
         case EmailTypes.ResetPassword:
             return 0;

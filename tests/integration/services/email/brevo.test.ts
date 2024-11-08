@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { brevoService, brevoInstance as brevo, getTemplateId } from '../../../../src/services/email/brevo';
@@ -12,13 +12,9 @@ describe('Brevo Service', () => {
     beforeAll(() => {
         emailService = brevoService();
 
-        vi.spyOn(brevo, 'sendTransacEmail').mockImplementation(async () => {
+        spyOn(brevo, 'sendTransacEmail').mockImplementation(async () => {
             return {} as any;
         });
-    });
-
-    afterEach(() => {
-        vi.clearAllMocks();
     });
 
     describe('Send Email Text', () => {
@@ -31,7 +27,7 @@ describe('Brevo Service', () => {
         };
 
         it('should send email text', async () => {
-            const spy = vi.spyOn(brevo, 'sendTransacEmail');
+            const spy = spyOn(brevo, 'sendTransacEmail');
 
             await emailService.sendEmailText(data);
 
@@ -39,7 +35,7 @@ describe('Brevo Service', () => {
         });
 
         it('should send email text with to, reply_to and from as string', async () => {
-            const spy = vi.spyOn(brevo, 'sendTransacEmail');
+            const spy = spyOn(brevo, 'sendTransacEmail');
 
             await emailService.sendEmailText({
                 from: faker.internet.email(),
@@ -53,7 +49,7 @@ describe('Brevo Service', () => {
         });
 
         it('should send email text with to as array of string', async () => {
-            const spy = vi.spyOn(brevo, 'sendTransacEmail');
+            const spy = spyOn(brevo, 'sendTransacEmail');
 
             await emailService.sendEmailText({
                 from: faker.internet.email(),
@@ -67,9 +63,9 @@ describe('Brevo Service', () => {
         });
 
         it('should catch error', async () => {
-            vi.spyOn(brevo, 'sendTransacEmail').mockRejectedValue(() => Promise.reject('error'));
+            spyOn(brevo, 'sendTransacEmail').mockRejectedValue(() => Promise.reject('error'));
 
-            const spy = vi.spyOn(logger, 'error');
+            const spy = spyOn(logger, 'error');
 
             await emailService.sendEmailText(data);
 
@@ -83,12 +79,12 @@ describe('Brevo Service', () => {
             to: [{ email: faker.internet.email(), name: faker.person.fullName() }],
             subject: faker.word.words(3),
             templateData: { otp: 123 },
-            emailType: EmailTypes.ConfirmEmail,
+            emailType: EmailTypes.VerifyEmail,
             reply_to: { email: faker.internet.email(), name: faker.person.fullName() },
         };
 
         it('should send email template', async () => {
-            const spy = vi.spyOn(brevo, 'sendTransacEmail');
+            const spy = spyOn(brevo, 'sendTransacEmail');
 
             await emailService.sendEmailTemplate(data);
 
@@ -96,9 +92,9 @@ describe('Brevo Service', () => {
         });
 
         it('should catch error', async () => {
-            vi.spyOn(brevo, 'sendTransacEmail').mockRejectedValue(() => Promise.reject('error'));
+            spyOn(brevo, 'sendTransacEmail').mockRejectedValue(() => Promise.reject('error'));
 
-            const spy = vi.spyOn(logger, 'error');
+            const spy = spyOn(logger, 'error');
 
             await emailService.sendEmailTemplate(data);
 

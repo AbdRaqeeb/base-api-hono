@@ -9,7 +9,7 @@ sgMail.setApiKey(Config.sendGridApiKey);
 export function getTemplateId(email_type: EmailTypes) {
     /* SET EMAIL TEMPLATES ID FROM SENDGRID */
     switch (email_type) {
-        case EmailTypes.ConfirmEmail:
+        case EmailTypes.VerifyEmail:
             return '';
         case EmailTypes.ResetPassword:
             return '';

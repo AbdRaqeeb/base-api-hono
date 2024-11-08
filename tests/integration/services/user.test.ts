@@ -2,7 +2,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { faker } from '@faker-js/faker';
 
 import { UserService } from '../../../src/types';
-import { disconnectDatabase } from '../../utils';
 import { repository, testDataService } from '../../utils';
 import { newUserService } from '../../../src/services';
 import { passwordService } from '../../../src/lib';
@@ -28,7 +27,7 @@ describe('User Service', () => {
                 has_password: true,
                 age_range: data.age_range,
                 is_active: true,
-                is_email_confirmed: false,
+                is_email_verified: false,
             });
             expect(result.password).toBeUndefined();
         });
@@ -47,7 +46,7 @@ describe('User Service', () => {
                 has_password: true,
                 age_range: user.age_range,
                 is_active: true,
-                is_email_confirmed: false,
+                is_email_verified: false,
             });
             expect(result.pagination).toMatchObject({
                 size: DEFAULT_SIZE,
@@ -69,7 +68,7 @@ describe('User Service', () => {
                 has_password: true,
                 age_range: user.age_range,
                 is_active: true,
-                is_email_confirmed: false,
+                is_email_verified: false,
             });
             expect(result.password).toBeUndefined();
         });
@@ -86,7 +85,7 @@ describe('User Service', () => {
                 has_password: true,
                 age_range: user.age_range,
                 is_active: true,
-                is_email_confirmed: false,
+                is_email_verified: false,
                 password: user.password,
             });
         });
@@ -106,7 +105,7 @@ describe('User Service', () => {
                 has_password: true,
                 age_range: user.age_range,
                 is_active: true,
-                is_email_confirmed: false,
+                is_email_verified: false,
             });
         });
 
@@ -137,7 +136,5 @@ describe('User Service', () => {
         });
     });
 
-    afterAll(async () => {
-        await disconnectDatabase();
-    });
+    afterAll(async () => {});
 });

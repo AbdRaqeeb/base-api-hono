@@ -1,4 +1,4 @@
 export default {
-  name: 'Base API',
-  logName: 'base-api',
-}
+    name: 'Base API',
+    logName: 'base-api',
+};

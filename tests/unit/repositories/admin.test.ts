@@ -1,9 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { AdminCreate, AdminRepository } from '../../../src/types';
 import { newAdminRepository } from '../../../src/repositories';
-import { DB, disconnectDatabase, testDataService } from '../../utils';
+import { DB, testDataService } from '../../utils';
 import { Role } from '../../../src/types/enums';
 
 describe('Admin Repository', () => {
@@ -167,9 +167,5 @@ describe('Admin Repository', () => {
 
             expect(result).toBeUndefined();
         });
-    });
-
-    afterAll(async () => {
-        await disconnectDatabase();
     });
 });

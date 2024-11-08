@@ -1,8 +1,7 @@
 import pino, { DestinationStream, Logger } from 'pino';
-import { NextFunction, Request, Response, UnknownObject } from '../types';
-import { NODE_ENV, LogLevels } from '../types/enums';
+import { UnknownObject, Context, Next } from '../types';
+import { LogLevels, NODE_ENV } from '../types/enums';
 import Config from '../config';
-import { generateRandomString } from '../lib';
 import project from '../project';
 
 const logTransport =
@@ -64,18 +63,17 @@ export class LogService {
 const logger = new LogService();
 
 export function logRequestMiddleware() {
-    return function (req: Request, res: Response, next: NextFunction) {
-        const requestId = generateRandomString();
-        req.request_id = requestId;
-        res.request_id = requestId;
+    return function (context: Context, next: Next) {
+        const requestId = context.get('requestId');
 
         logger.request(requestId, {
-            route: req.route,
-            url: req.url,
-            body: req.body,
-            query: req.query,
-            params: req.params,
-            headers: req.headers,
+            route: context.req.path,
+            url: context.req.url,
+            body: context.req.json(),
+            query: context.req.query(),
+            params: context.req.param(),
+            headers: context.req.header(),
+            method: context.req.method,
         });
         return next();
     };

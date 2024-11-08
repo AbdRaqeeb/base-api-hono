@@ -44,7 +44,7 @@ export enum EmailClient {
 }
 
 export enum EmailTypes {
-    ConfirmEmail = 'confirm-email',
+    VerifyEmail = 'verify-email',
     ResetPassword = 'reset-password',
     SetPassword = 'set-password',
     AdminCredentials = 'admin-credentials',
@@ -52,7 +52,7 @@ export enum EmailTypes {
 
 export enum OtpType {
     ResetPassword = 'reset-password',
-    ConfirmEmail = 'confirm-email',
+    VerifyEmail = 'verify-email',
     SetPassword = 'set-password',
 }
 

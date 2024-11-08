@@ -1,5 +1,5 @@
 export default {
-    'src/**/*.ts': () => ['yarn run type:check'],
+    'src/**/*.ts': () => ['bun run type:check'],
 
-    '**/*.{ts,js}': () => ['yarn run lint', 'yarn run prettier:fix'],
+    '**/*.{ts,js}': () => ['bun run lint', 'bun run prettier:fix'],
 };

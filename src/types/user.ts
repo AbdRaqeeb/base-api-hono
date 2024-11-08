@@ -10,7 +10,7 @@ export interface User {
     email: string;
     avatar_url?: string;
     password?: string;
-    is_email_confirmed: boolean;
+    is_email_verified: boolean;
     is_active: boolean;
     created_at: Date;
     updated_at: Date;
@@ -23,11 +23,11 @@ export interface UserCreate {
     email: string;
     password?: string;
     avatar_url?: string;
-    is_email_confirmed?: boolean;
+    is_email_verified?: boolean;
 }
 
 export type UserUpdate = Partial<UserCreate> & {
-    is_email_confirmed?: boolean;
+    is_email_verified?: boolean;
     is_active?: boolean;
 };
 
@@ -37,7 +37,7 @@ export interface UserFilter extends RangeFilter, PaginationParam {
     last_name?: string;
     age_range?: AgeRange;
     email?: string;
-    is_email_confirmed?: boolean;
+    is_email_verified?: boolean;
     is_active?: boolean;
 }
 

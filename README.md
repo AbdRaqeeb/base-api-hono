@@ -1,19 +1,17 @@
+# Base API (Hono)
 
-# Base API
-
-This is a customizable starter api application built using [NodeJS](https://nodejs.org/) and [ExpressJS](https://expressjs.com).
-
+This is a customizable starter api application built using [Bun](https://bun.sh) and [Hono](https://hono.dev).
 
 ## Features
 
-- Rest API
-- Database (postgres) Configurable to desired database  
-- Logging (pino)
-- Tests (Unit, Integration and e2e)
-- Docker
-- Linting
-- Code formatting
-- Dependency Inject Architecture
+-   Rest API
+-   Database (postgres) Configurable to desired database
+-   Logging (pino)
+-   Tests (Unit, Integration and e2e)
+-   Docker
+-   Linting
+-   Code formatting
+-   Dependency Inject Architecture
 
 ## Project Setup
 
@@ -31,14 +29,13 @@ Copy the variables in the `.env.example` into the `.env` file.
     cp .env.example .env
 ```
 
-Use the node version stated in the `.nvmrc` file. 
+Use the node version stated in the `.nvmrc` file.
 
 ```bash
     nvm use
 ```
 
 You can use node version manager (`nvm`) to use multiple node versions on your system. [Windows](https://github.com/coreybutler/nvm-windows) or [Linux](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-22-04#option-3-installing-node-using-the-node-version-manager)
-
 
 ## Run Locally
 
@@ -63,9 +60,11 @@ Build
 ```
 
 Start
+
 ```bash
     yarn start
 ```
+
 ## Running Tests
 
 Create a `.env.test` file in the tests util directory.
@@ -80,7 +79,6 @@ Copy the variables in the `.env.example` into the `.env` file and fill with test
     cp .env.example tests/utils/.env.test
 ```
 
-
 Test
 
 ```bash
@@ -92,4 +90,3 @@ Test Coverage
 ```bash
     yarn test:coverage
 ```
-

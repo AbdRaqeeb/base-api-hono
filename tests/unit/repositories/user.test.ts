@@ -1,16 +1,15 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { UserCreate, UserRepository } from '../../../src/types';
 import { newUserRepository } from '../../../src/repositories';
-import { DB, disconnectDatabase } from '../../utils';
+import { DB, testDataService } from '../../utils';
 import { AgeRange } from '../../../src/types/enums';
-import { testDataService } from '../../utils';
 
 describe('User Repository', () => {
     let userRepository: UserRepository;
 
-    beforeAll(() => {
+    beforeAll(async () => {
         userRepository = newUserRepository({ DB });
     });
 
@@ -34,7 +33,7 @@ describe('User Repository', () => {
                 password: data.password,
                 age_range: data.age_range,
                 is_active: true,
-                is_email_confirmed: false,
+                is_email_verified: false,
             });
         });
     });
@@ -55,7 +54,7 @@ describe('User Repository', () => {
                         password: user.password,
                         age_range: user.age_range,
                         is_active: true,
-                        is_email_confirmed: false,
+                        is_email_verified: false,
                     }),
                 ])
             );
@@ -76,7 +75,7 @@ describe('User Repository', () => {
                         password: user.password,
                         age_range: user.age_range,
                         is_active: true,
-                        is_email_confirmed: false,
+                        is_email_verified: false,
                     }),
                 ])
             );
@@ -99,7 +98,7 @@ describe('User Repository', () => {
 
             const result = await userRepository.get({
                 id: user.id,
-                is_email_confirmed: false,
+                is_email_verified: false,
                 is_active: true,
                 age_range,
                 first_name,
@@ -115,7 +114,7 @@ describe('User Repository', () => {
                 password: user.password,
                 age_range: user.age_range,
                 is_active: true,
-                is_email_confirmed: false,
+                is_email_verified: false,
             });
         });
     });
@@ -124,7 +123,7 @@ describe('User Repository', () => {
         it('should update user', async () => {
             const { user } = await testDataService.createUser();
 
-            const result = await userRepository.update({ id: user.id }, { is_email_confirmed: true });
+            const result = await userRepository.update({ id: user.id }, { is_email_verified: true });
 
             expect(result).toMatchObject({
                 id: expect.any(Number),
@@ -134,7 +133,7 @@ describe('User Repository', () => {
                 password: user.password,
                 age_range: user.age_range,
                 is_active: true,
-                is_email_confirmed: true,
+                is_email_verified: true,
             });
         });
     });
@@ -152,7 +151,5 @@ describe('User Repository', () => {
         });
     });
 
-    afterAll(async () => {
-        await disconnectDatabase();
-    });
+    afterAll(async () => {});
 });

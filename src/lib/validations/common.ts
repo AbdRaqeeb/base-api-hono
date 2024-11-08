@@ -11,7 +11,7 @@ export const resetPasswordSchema: ObjectSchema<types.ResetPasswordSchema> = Joi.
     password: Joi.string().pattern(new RegExp(PASSWORD_REGEX)).required(),
 });
 
-export const confirmEmailSchema: ObjectSchema<types.ConfirmEmailSchema> = Joi.object({
+export const verifyEmailSchema: ObjectSchema<types.VerifyEmailSchema> = Joi.object({
     code: Joi.string().required(),
 });
 

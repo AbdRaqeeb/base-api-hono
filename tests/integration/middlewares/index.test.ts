@@ -1,32 +1,34 @@
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'bun:test';
 
-import { disconnectDatabase, server, testDataService } from '../../utils';
+import { server, testDataService } from '../../utils';
 import { HttpStatusCode } from '../../../src/types/enums';
 
 describe('Middlewares', () => {
     describe('Validate Authorization Header', () => {
         it('should return 401 when no token is passed', async () => {
-            const response = await server.post('/api/auth/user/change-password').send({});
-
+            const response = await server.post('/api/auth/user/change-password', {});
             expect(response.status).toEqual(HttpStatusCode.Unauthorized);
-            expect(response.body.message).toBe('Please specify authorization header');
+
+            const body = await response.json();
+            expect(body.message).toBe('Please specify authorization header');
         });
 
         it('should return 401 with incorrect headers', async () => {
-            const response = await server.post('/api/auth/user/change-password').send({}).set('Authorization', 'test');
-
+            const response = await server.post('/api/auth/user/change-password', {}, null, { Authorization: 'test' });
             expect(response.status).toEqual(HttpStatusCode.Unauthorized);
-            expect(response.body.message).toBe('Please specify correct authorization header');
+
+            const body = await response.json();
+            expect(body.message).toBe('Please specify correct authorization header');
         });
 
         it('should return 401 with unsupported headers', async () => {
-            const response = await server
-                .post('/api/auth/user/change-password')
-                .send({})
-                .set('Authorization', 'Bean test');
-
+            const response = await server.post('/api/auth/user/change-password', {}, null, {
+                Authorization: 'Bean test',
+            });
             expect(response.status).toEqual(HttpStatusCode.Unauthorized);
-            expect(response.body.message).toBe('Please specify correct authorization header');
+
+            const body = await response.json();
+            expect(body.message).toBe('Please specify correct authorization header');
         });
     });
 
@@ -34,29 +36,23 @@ describe('Middlewares', () => {
         it('should return 400 with expired token', async () => {
             const token = testDataService.issueExpiredToken();
 
-            const response = await server
-                .post('/api/auth/user/change-password')
-                .send({})
-                .set('Authorization', `Bearer ${token}`);
-
+            const response = await server.post('/api/auth/user/change-password', {}, token);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body.message).toBe('Token expired');
+
+            const body = await response.json();
+            expect(body.message).toBe('Token expired');
         });
 
         it('should return 400 with bad token', async () => {
             const token = testDataService.issueBadToken();
 
-            const response = await server
-                .post('/api/auth/user/change-password')
-                .send({})
-                .set('Authorization', `Bearer ${token}`);
-
+            const response = await server.post('/api/auth/user/change-password', {}, token);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body.message).toBe('Not authorized to access this route');
+
+            const body = await response.json();
+            expect(body.message).toBe('Not authorized to access this route');
         });
     });
 
-    afterAll(async () => {
-        await disconnectDatabase();
-    });
+    afterAll(async () => {});
 });

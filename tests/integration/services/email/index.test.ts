@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import * as types from '../../../../src/types';
@@ -17,10 +17,6 @@ describe('Email Service', () => {
         emailService = newEmailService(emailServiceStore);
     });
 
-    afterEach(() => {
-        vi.clearAllMocks();
-    });
-
     describe('Send Text Email', () => {
         const params: types.SendEmailTextParams = {
             to: [faker.internet.email()],
@@ -32,7 +28,7 @@ describe('Email Service', () => {
         };
 
         it('should send text email', async () => {
-            const spy = vi.spyOn(sgMail, 'send');
+            const spy = spyOn(sgMail, 'send');
 
             await emailService.sendEmailText(params, EmailClient.Sendgrid);
 
@@ -45,14 +41,14 @@ describe('Email Service', () => {
             to: [faker.internet.email()],
             from: faker.internet.email(),
             subject: faker.word.words(),
-            emailType: EmailTypes.ConfirmEmail,
+            emailType: EmailTypes.VerifyEmail,
             templateData: { otp: '123456' },
             reply_to: faker.internet.email(),
             send_at: Date.now(),
         };
 
         it('should send template email', async () => {
-            const spy = vi.spyOn(mg.messages, 'create');
+            const spy = spyOn(mg.messages, 'create');
 
             await emailService.sendEmailTemplate(params, EmailClient.Mailgun);
 

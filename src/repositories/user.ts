@@ -48,7 +48,7 @@ function findUserBaseQuery(db: Knex, filter: UserFilter): Knex.QueryBuilder {
     if (filter.last_name) query.whereRaw(`LOWER(u.last_name) = ?`, [filter.last_name.toLowerCase()]);
     if (filter.email) query.whereRaw(`LOWER(u.email) = ?`, [filter.email.toLowerCase()]);
     if (filter.is_active) query.where('u.is_active', filter.is_active);
-    if (filter.is_email_confirmed) query.where('u.is_email_confirmed', filter.is_email_confirmed);
+    if (filter.is_email_verified) query.where('u.is_email_verified', filter.is_email_verified);
     if (filter.search)
         query.where(function () {
             this.orWhereRaw('LOWER(u.first_name) LIKE ?', [`%${filter.search.toLowerCase()}%`])
@@ -80,7 +80,7 @@ const fields = [
     'u.age_range as age_range',
     'u.avatar_url as avatar_url',
     'u.password as password',
-    'u.is_email_confirmed as is_email_confirmed',
+    'u.is_email_verified as is_email_verified',
     'u.is_active as is_active',
     'u.created_at as created_at',
     'u.updated_at as updated_at',

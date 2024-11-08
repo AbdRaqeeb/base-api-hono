@@ -1,8 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { OtpCreate, OtpService } from '../../../src/types';
-import { disconnectDatabase, repository, testDataService } from '../../utils';
+import { repository, testDataService } from '../../utils';
 import { OtpType, UserModel } from '../../../src/types/enums';
 import { newOtpService } from '../../../src/services';
 
@@ -52,7 +52,7 @@ describe('Otp Service', () => {
             const result = await otpService.get({
                 model: otp.model,
                 model_id: otp.model_id,
-                type: OtpType.ConfirmEmail,
+                type: OtpType.VerifyEmail,
                 code: faker.number.int({ min: 1, max: 100 }).toString(),
             });
 
@@ -80,7 +80,5 @@ describe('Otp Service', () => {
         });
     });
 
-    afterAll(async () => {
-        await disconnectDatabase();
-    });
+    afterAll(async () => {});
 });

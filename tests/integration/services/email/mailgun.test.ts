@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { mailgunService, mg } from '../../../../src/services/email/mailgun';
@@ -11,10 +11,6 @@ describe('Mailgun Service', () => {
 
     beforeAll(() => {
         emailService = mailgunService();
-    });
-
-    afterEach(() => {
-        vi.clearAllMocks();
     });
 
     describe('Send Email Text', () => {
@@ -33,7 +29,9 @@ describe('Mailgun Service', () => {
         };
 
         it('should send email text', async () => {
-            const spy = vi.spyOn(mg.messages, 'create');
+            const spy = spyOn(mg.messages, 'create').mockImplementation(async () => {
+                return {} as any;
+            });
 
             await emailService.sendEmailText(data);
 
@@ -41,9 +39,9 @@ describe('Mailgun Service', () => {
         });
 
         it('should catch error', async () => {
-            vi.spyOn(mg.messages, 'create').mockRejectedValue(() => Promise.reject('error'));
+            spyOn(mg.messages, 'create').mockRejectedValue(() => Promise.reject('error'));
 
-            const spy = vi.spyOn(logger, 'error');
+            const spy = spyOn(logger, 'error');
 
             await emailService.sendEmailText(data);
 
@@ -57,7 +55,7 @@ describe('Mailgun Service', () => {
             to: [faker.internet.email()],
             subject: faker.word.words(3),
             templateData: {},
-            emailType: EmailTypes.ConfirmEmail,
+            emailType: EmailTypes.VerifyEmail,
             reply_to: faker.internet.email(),
             delivery_time: new Date().toISOString(),
             tracking: true,
@@ -68,7 +66,7 @@ describe('Mailgun Service', () => {
         };
 
         it('should send email template', async () => {
-            const spy = vi.spyOn(mg.messages, 'create');
+            const spy = spyOn(mg.messages, 'create');
 
             await emailService.sendEmailTemplate(data);
 
@@ -76,9 +74,9 @@ describe('Mailgun Service', () => {
         });
 
         it('should catch error', async () => {
-            vi.spyOn(mg.messages, 'create').mockRejectedValue(() => Promise.reject('error'));
+            spyOn(mg.messages, 'create').mockRejectedValue(() => Promise.reject('error'));
 
-            const spy = vi.spyOn(logger, 'error');
+            const spy = spyOn(logger, 'error');
 
             await emailService.sendEmailTemplate(data);
 

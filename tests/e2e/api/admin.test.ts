@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, spyOn } from 'bun:test';
 
-import { disconnectDatabase, repository, server, testDataService } from '../../utils';
+import { repository, server, testDataService } from '../../utils';
 import { HttpStatusCode, OtpType, Role, UserModel } from '../../../src/types/enums';
 import { passwordService } from '../../../src/lib';
 import { sgMail as sendgrid } from '../../../src/services/email/sendgrid';
@@ -9,10 +9,10 @@ import { brevoInstance as brevo } from '../../../src/services/email/brevo';
 
 describe('Admin Endpoints', () => {
     beforeAll(() => {
-        vi.spyOn(sendgrid, 'send').mockImplementation(async () => {
+        spyOn(sendgrid, 'send').mockImplementation(async () => {
             return {} as any;
         });
-        vi.spyOn(brevo, 'sendTransacEmail').mockImplementation(async () => {
+        spyOn(brevo, 'sendTransacEmail').mockImplementation(async () => {
             return {} as any;
         });
     });
@@ -28,10 +28,11 @@ describe('Admin Endpoints', () => {
                 username: faker.internet.userName(),
             };
 
-            const result = await server.post('/api/auth/admin/new').send(data).set('Authorization', `Bearer ${token}`);
-
+            const result = await server.post('/api/auth/admin/new', data, token);
             expect(result.status).toEqual(HttpStatusCode.Created);
-            expect(result.body).toMatchObject({ message: 'Admin added' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'Admin added' });
         });
 
         it('should return 403 for role that is not super admin', async () => {
@@ -44,7 +45,7 @@ describe('Admin Endpoints', () => {
                 username: faker.internet.userName(),
             };
 
-            const result = await server.post('/api/auth/admin/new').send(data).set('Authorization', `Bearer ${token}`);
+            const result = await server.post('/api/auth/admin/new', data, token);
 
             expect(result.status).toEqual(HttpStatusCode.Forbidden);
         });
@@ -57,10 +58,11 @@ describe('Admin Endpoints', () => {
                 last_name: faker.person.lastName(),
             };
 
-            const result = await server.post('/api/auth/admin/new').send(data).set('Authorization', `Bearer ${token}`);
-
+            const result = await server.post('/api/auth/admin/new', data, token);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'email is required' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'email is required' });
         });
 
         it('should fail on existing admin email', async () => {
@@ -73,10 +75,11 @@ describe('Admin Endpoints', () => {
                 username: faker.internet.userName(),
             };
 
-            const result = await server.post('/api/auth/admin/new').send(data).set('Authorization', `Bearer ${token}`);
-
+            const result = await server.post('/api/auth/admin/new', data, token);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'Admin exists already' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'Admin exists already' });
         });
 
         it('should fail on existing admin username', async () => {
@@ -89,10 +92,11 @@ describe('Admin Endpoints', () => {
                 username: admin.username,
             };
 
-            const result = await server.post('/api/auth/admin/new').send(data).set('Authorization', `Bearer ${token}`);
-
+            const result = await server.post('/api/auth/admin/new', data, token);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'Admin exists already' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'Admin exists already' });
         });
     });
 
@@ -103,10 +107,11 @@ describe('Admin Endpoints', () => {
 
             const data = { email_or_username: admin.email, password };
 
-            const result = await server.post('/api/auth/admin/login').send(data);
-
+            const result = await server.post('/api/auth/admin/login', data);
             expect(result.status).toEqual(HttpStatusCode.Ok);
-            expect(result.body.data).toMatchObject({
+
+            const body = await result.json();
+            expect(body.data).toMatchObject({
                 admin: {
                     email: admin.email,
                     username: admin.username,
@@ -124,10 +129,11 @@ describe('Admin Endpoints', () => {
 
             const data = { email_or_username: admin.username, password };
 
-            const result = await server.post('/api/auth/admin/login').send(data);
-
+            const result = await server.post('/api/auth/admin/login', data);
             expect(result.status).toEqual(HttpStatusCode.Ok);
-            expect(result.body.data).toMatchObject({
+
+            const body = await result.json();
+            expect(body.data).toMatchObject({
                 admin: {
                     email: admin.email,
                     username: admin.username,
@@ -145,10 +151,11 @@ describe('Admin Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const result = await server.post('/api/auth/admin/login').send(data);
-
+            const result = await server.post('/api/auth/admin/login', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'Invalid email/password' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'Invalid email/password' });
         });
 
         it('should return invalid email/password with wrong username', async () => {
@@ -157,10 +164,11 @@ describe('Admin Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const result = await server.post('/api/auth/admin/login').send(data);
-
+            const result = await server.post('/api/auth/admin/login', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'Invalid email/password' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'Invalid email/password' });
         });
 
         it('should return invalid email/password with wrong password', async () => {
@@ -171,19 +179,21 @@ describe('Admin Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const result = await server.post('/api/auth/admin/login').send(data);
-
+            const result = await server.post('/api/auth/admin/login', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'Invalid email/password' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'Invalid email/password' });
         });
 
         it('should fail with bad payload', async () => {
             const data = { email_or_username: faker.internet.email() };
 
-            const result = await server.post('/api/auth/admin/login').send(data);
-
+            const result = await server.post('/api/auth/admin/login', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'password is required' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'password is required' });
         });
     });
 
@@ -193,19 +203,21 @@ describe('Admin Endpoints', () => {
 
             const data = { email: admin.email };
 
-            const response = await server.post('/api/auth/admin/forgot-password').send(data);
-
+            const response = await server.post('/api/auth/admin/forgot-password', data);
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Forgot password email sent' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Forgot password email sent' });
         });
 
         it('should return 400 with bad payload', async () => {
             const data = {};
 
-            const response = await server.post('/api/auth/admin/forgot-password').send(data);
-
+            const response = await server.post('/api/auth/admin/forgot-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'email is required' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'email is required' });
         });
     });
 
@@ -223,7 +235,7 @@ describe('Admin Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/admin/reset-password').send(data);
+            const response = await server.post('/api/auth/admin/reset-password', data);
 
             const updatedAdmin = await repository.admin.get({ email: admin.email });
             const foundOtp = await repository.otp.get({
@@ -232,9 +244,10 @@ describe('Admin Endpoints', () => {
                 model_id: otp.model_id,
                 type: otp.type,
             });
-
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Password has been reset' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Password has been reset' });
             expect(foundOtp).toBeUndefined();
             expect(passwordService.valid(data.password, updatedAdmin.password)).toBeTruthy();
         });
@@ -242,10 +255,11 @@ describe('Admin Endpoints', () => {
         it('should return 400 with bad payload', async () => {
             const data = {};
 
-            const response = await server.post('/api/auth/admin/reset-password').send(data);
-
+            const response = await server.post('/api/auth/admin/reset-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'code is required' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'code is required' });
         });
 
         it('should return 400 with invalid otp', async () => {
@@ -254,10 +268,11 @@ describe('Admin Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/admin/reset-password').send(data);
-
+            const response = await server.post('/api/auth/admin/reset-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid / expired otp' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid / expired otp' });
         });
 
         it('should return 400 with invalid admin', async () => {
@@ -266,10 +281,11 @@ describe('Admin Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/admin/reset-password').send(data);
-
+            const response = await server.post('/api/auth/admin/reset-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid / expired otp' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid / expired otp' });
         });
     });
 
@@ -283,15 +299,14 @@ describe('Admin Endpoints', () => {
                 new_password: testDataService.generatePassword(),
             };
 
-            const response = await server
-                .post('/api/auth/admin/change-password')
-                .send(data)
-                .set('Authorization', `Bearer ${token}`);
+            const response = await server.post('/api/auth/admin/change-password', data, token);
 
             const updatedAdmin = await repository.admin.get({ id: admin.id });
 
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Password changed' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Password changed' });
             expect(passwordService.valid(data.new_password, updatedAdmin.password)).toBeTruthy();
             expect(passwordService.valid(data.password, updatedAdmin.password)).toBeFalsy();
         });
@@ -301,13 +316,11 @@ describe('Admin Endpoints', () => {
 
             const data = {};
 
-            const response = await server
-                .post('/api/auth/admin/change-password')
-                .send(data)
-                .set('Authorization', `Bearer ${token}`);
-
+            const response = await server.post('/api/auth/admin/change-password', data, token);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'password is required' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'password is required' });
         });
 
         it('should return 400 with invalid current password', async () => {
@@ -318,17 +331,13 @@ describe('Admin Endpoints', () => {
                 new_password: testDataService.generatePassword(),
             };
 
-            const response = await server
-                .post('/api/auth/admin/change-password')
-                .send(data)
-                .set('Authorization', `Bearer ${token}`);
-
+            const response = await server.post('/api/auth/admin/change-password', data, token);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid current password' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid current password' });
         });
     });
 
-    afterAll(async () => {
-        await disconnectDatabase();
-    });
+    afterAll(async () => {});
 });

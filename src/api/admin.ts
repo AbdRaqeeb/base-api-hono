@@ -1,4 +1,5 @@
-import { AdminResponse, OtpFilter, Request, Response, Router, Server } from '../types';
+import { every } from 'hono/combine';
+import { AdminResponse, OtpFilter, Server, Context, Router, ForgotPasswordSchema } from '../types';
 import * as lib from '../lib';
 import { passwordService } from '../lib';
 import * as schema from '../lib/validations';
@@ -11,23 +12,25 @@ export function adminHttpService(server: Server) {
     const { isAuthenticatedAdminJWT, authorizeAdminRole } = middleware(server);
 
     function registerAdminRoutes(router: Router) {
-        router.post('/auth/admin/new', [isAuthenticatedAdminJWT, authorizeAdminRole([Role.SuperAdmin])], addAdmin);
+        router.post('/auth/admin/new', every(isAuthenticatedAdminJWT, authorizeAdminRole([Role.SuperAdmin])), addAdmin);
         router.post('/auth/admin/login', login);
         router.post('/auth/admin/forgot-password', forgotPassword);
         router.post('/auth/admin/reset-password', resetPassword);
         router.post('/auth/admin/change-password', isAuthenticatedAdminJWT, changePassword);
     }
 
-    async function addAdmin(req: Request, res: Response): Promise<Response> {
+    async function addAdmin(context: Context): Promise<Response> {
         try {
-            const { error, value } = lib.validateSchema(schema.createAdminSchema, req.body);
-            if (error) return lib.errorResponse(res, HttpStatusCode.BadRequest, error);
+            const { error, value } = lib.validateSchema(schema.createAdminSchema, context.get('body'));
+            if (error) return lib.errorResponse(context, HttpStatusCode.BadRequest, error);
 
             const foundAdmin = await server.adminService.check({
                 email: value.email,
                 username: value.username,
             });
-            if (foundAdmin) return lib.errorResponse(res, HttpStatusCode.BadRequest, 'Admin exists already');
+            if (foundAdmin) {
+                return lib.errorResponse(context, HttpStatusCode.BadRequest, 'Admin exists already');
+            }
 
             const password = passwordService.generatePassword();
 
@@ -36,69 +39,54 @@ export function adminHttpService(server: Server) {
             // create admin
             const admin = await server.adminService.add(data);
 
-            lib.successResponse(res, HttpStatusCode.Created, 'Admin added');
+            sendNewAccountEmail(admin, password);
 
-            // send new admin account email
-            await sendNewAccountEmail(admin, password);
+            return lib.successResponse(context, HttpStatusCode.Created, 'Admin added');
         } catch (error) {
-            return lib.serverErrorResponse(res, '[AdminHttpService][AddAdmin]', error);
+            return lib.serverErrorResponse(context, '[AdminHttpService][AddAdmin]', error);
         }
     }
 
-    async function login(req: Request, res: Response): Promise<Response> {
+    async function login(context: Context): Promise<Response> {
         try {
-            const { error, value } = lib.validateSchema(schema.adminLoginSchema, req.body);
-            if (error) return lib.errorResponse(res, HttpStatusCode.BadRequest, error);
+            const { error, value } = lib.validateSchema(schema.adminLoginSchema, context.get('body'));
+            if (error) return lib.errorResponse(context, HttpStatusCode.BadRequest, error);
 
             const admin = await server.adminService.get(
                 { email_or_username: value.email_or_username },
                 { includePassword: true }
             );
-            if (!admin) return lib.errorResponse(res, HttpStatusCode.BadRequest, 'Invalid email/password');
+            if (!admin) return lib.errorResponse(context, HttpStatusCode.BadRequest, 'Invalid email/password');
 
             if (!lib.passwordService.valid(value.password, admin.password)) {
-                return lib.errorResponse(res, HttpStatusCode.BadRequest, 'Invalid email/password');
+                return lib.errorResponse(context, HttpStatusCode.BadRequest, 'Invalid email/password');
             }
 
             const result = generateToken(admin);
 
-            return lib.successResponse(res, HttpStatusCode.Ok, 'Login Successful', result);
+            return lib.successResponse(context, HttpStatusCode.Ok, 'Login Successful', result);
         } catch (error) {
-            return lib.serverErrorResponse(res, '[AdminHttpService][Login]', error);
+            return lib.serverErrorResponse(context, '[AdminHttpService][Login]', error);
         }
     }
 
-    async function forgotPassword(req: Request, res: Response): Promise<Response> {
+    async function forgotPassword(context: Context): Promise<Response> {
         try {
-            const { error, value } = lib.validateSchema(schema.forgotPasswordSchema, req.body);
-            if (error) return lib.errorResponse(res, HttpStatusCode.BadRequest, error);
+            const { error, value } = lib.validateSchema(schema.forgotPasswordSchema, context.get('body'));
+            if (error) return lib.errorResponse(context, HttpStatusCode.BadRequest, error);
 
-            lib.successResponse(res, HttpStatusCode.Ok, 'Forgot password email sent');
+            sendForgotPasswordEmail(value);
 
-            try {
-                const foundAdmin = await server.adminService.get({ email: value.email });
-                if (!foundAdmin) return;
-
-                const otp = await server.otpService.add({
-                    model: UserModel.Admin,
-                    model_id: foundAdmin.id,
-                    type: OtpType.ResetPassword,
-                });
-                if (!otp) return;
-
-                await sendOtp(foundAdmin, OtpType.ResetPassword, EmailTypes.ResetPassword);
-            } catch (error) {
-                logger.error(error, '[AdminHttpService][ForgotPassword]');
-            }
+            return lib.successResponse(context, HttpStatusCode.Ok, 'Forgot password email sent');
         } catch (error) {
-            return lib.serverErrorResponse(res, '[AdminHttpService][ForgotPassword]', error);
+            return lib.serverErrorResponse(context, '[AdminHttpService][ForgotPassword]', error);
         }
     }
 
-    async function resetPassword(req: Request, res: Response): Promise<Response> {
+    async function resetPassword(context: Context): Promise<Response> {
         try {
-            const { error, value } = lib.validateSchema(schema.resetPasswordSchema, req.body);
-            if (error) return lib.errorResponse(res, HttpStatusCode.BadRequest, error);
+            const { error, value } = lib.validateSchema(schema.resetPasswordSchema, context.get('body'));
+            if (error) return lib.errorResponse(context, HttpStatusCode.BadRequest, error);
 
             const filter = {
                 model: UserModel.Admin,
@@ -107,36 +95,52 @@ export function adminHttpService(server: Server) {
             };
 
             const { error: passwordError } = await managePassword(filter, value.password);
-            if (passwordError) return lib.errorResponse(res, HttpStatusCode.BadRequest, passwordError);
+            if (passwordError) return lib.errorResponse(context, HttpStatusCode.BadRequest, passwordError);
 
-            return lib.successResponse(res, HttpStatusCode.Ok, 'Password has been reset');
+            return lib.successResponse(context, HttpStatusCode.Ok, 'Password has been reset');
         } catch (error) {
-            return lib.serverErrorResponse(res, '[AdminHttpService][ForgotPassword]', error);
+            return lib.serverErrorResponse(context, '[AdminHttpService][ForgotPassword]', error);
         }
     }
 
-    async function changePassword(req: Request, res: Response): Promise<Response> {
+    /**
+     * Handles the change password functionality for admin users.
+     *
+     * @param context - The HTTP context containing request and response information.
+     * @returns A Promise that resolves to an HTTP response.
+     *
+     * @remarks
+     * This function performs the following steps:
+     * 1. Validates the request body using the `changePasswordSchema`.
+     * 2. Retrieves the admin user from the database based on the admin ID stored in the request context.
+     * 3. Checks if the provided current password matches the stored password.
+     * 4. Updates the admin's password in the database.
+     * 5. Returns a success response with a message indicating that the password has been changed.
+     *
+     * If any validation or database operation fails, an appropriate error response is returned.
+     */
+    async function changePassword(context: Context): Promise<Response> {
         try {
-            const { error, value } = lib.validateSchema(schema.changePasswordSchema, req.body);
-            if (error) return lib.errorResponse(res, HttpStatusCode.BadRequest, error);
+            const { error, value } = lib.validateSchema(schema.changePasswordSchema, context.get('body'));
+            if (error) return lib.errorResponse(context, HttpStatusCode.BadRequest, error);
 
-            const admin = await server.adminService.get({ id: req.admin.id }, { includePassword: true });
+            const admin = await server.adminService.get({ id: context.get('admin').id }, { includePassword: true });
 
             const isValidOldPassword = lib.passwordService.valid(value.password, admin.password);
 
             if (!isValidOldPassword) {
-                return lib.errorResponse(res, HttpStatusCode.BadRequest, 'Invalid current password');
+                return lib.errorResponse(context, HttpStatusCode.BadRequest, 'Invalid current password');
             }
 
             // update password
             await server.adminService.update(
-                { id: req.admin.id },
+                { id: context.get('admin').id },
                 { password: value.new_password, is_newly_created: false }
             );
 
-            return lib.successResponse(res, HttpStatusCode.Ok, 'Password changed');
+            return lib.successResponse(context, HttpStatusCode.Ok, 'Password changed');
         } catch (error) {
-            return lib.serverErrorResponse(res, '[AdminHttpService][ForgotPassword]', error);
+            return lib.serverErrorResponse(context, '[AdminHttpService][ForgotPassword]', error);
         }
     }
 
@@ -173,6 +177,24 @@ export function adminHttpService(server: Server) {
             );
         } catch (error) {
             logger.error(error, `[AdminHttpService][SendOtp] - sending admin ${type} otp error`);
+        }
+    }
+
+    async function sendForgotPasswordEmail(value: ForgotPasswordSchema) {
+        try {
+            const foundAdmin = await server.adminService.get({ email: value.email });
+            if (!foundAdmin) return;
+
+            const otp = await server.otpService.add({
+                model: UserModel.Admin,
+                model_id: foundAdmin.id,
+                type: OtpType.ResetPassword,
+            });
+            if (!otp) return;
+
+            await sendOtp(foundAdmin, OtpType.ResetPassword, EmailTypes.ResetPassword);
+        } catch (error) {
+            logger.error(error, '[AdminHttpService][ForgotPassword]');
         }
     }
 

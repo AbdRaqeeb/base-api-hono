@@ -28,7 +28,7 @@ function newTestData(rp: types.Repository) {
             password: payload?.password || faker.internet.password(),
             age_range: payload?.age_range || enums.AgeRange.ADULT,
             avatar_url: payload?.avatar_url || faker.image.avatar(),
-            is_email_confirmed: payload?.is_email_confirmed || false,
+            is_email_verified: payload?.is_email_verified || false,
         };
 
         // skip password

@@ -1,27 +1,38 @@
-import { Response } from '../types';
-import logger from '../log';
+import { Context } from '../types';
 import { HttpStatusCode } from '../types/enums';
+import logger from '../log';
 
-export const errorResponse = (res: Response, statusCode: number, message: string, err?: Error, data?: any) => {
+export const errorResponse = (
+    context: Context,
+    statusCode: HttpStatusCode,
+    message: string,
+    err?: Error,
+    data?: any
+) => {
     const response = { message, data };
+    logger.response(context.get('requestId'), statusCode, { message });
+    context.status(statusCode);
 
-    logger.response(res.request_id, statusCode, { message });
-    return res.status(statusCode).json(response);
+    return context.json(response);
 };
 
-export const serverErrorResponse = (res: Response, context: string, err: Error) => {
-    logger.error(err, `[${context}] Internal Server Error`);
+export const serverErrorResponse = (context: Context, source: string, err: Error) => {
+    logger.error(err, `[${source}] Internal Server Error`);
 
     const response = { message: 'Internal Server Error' };
 
-    logger.response(res.request_id, HttpStatusCode.InternalServerError, response);
+    logger.response(context.get('requestId'), HttpStatusCode.InternalServerError, response);
 
-    return res.status(HttpStatusCode.InternalServerError).json(response);
+    context.status(HttpStatusCode.InternalServerError);
+
+    return context.json(response);
 };
 
-export const successResponse = (res: Response, statusCode: number, message: string, data?: any) => {
+export const successResponse = (context: Context, statusCode: HttpStatusCode, message: string, data?: any) => {
     const response = { message, data };
 
-    logger.response(res.request_id, statusCode, { message });
-    return res.status(statusCode).json(response);
+    logger.response(context.get('requestId'), statusCode, { message });
+    context.status(statusCode);
+
+    return context.json(response);
 };

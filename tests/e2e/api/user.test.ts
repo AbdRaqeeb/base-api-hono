@@ -1,14 +1,14 @@
 import { faker } from '@faker-js/faker';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, spyOn } from 'bun:test';
 
-import { disconnectDatabase, repository, server, testDataService } from '../../utils';
+import { repository, server, testDataService } from '../../utils';
 import { AgeRange, HttpStatusCode, OtpType, UserModel } from '../../../src/types/enums';
 import { passwordService } from '../../../src/lib';
 import { brevoInstance as brevo } from '../../../src/services/email/brevo';
 
 describe('User Endpoints', () => {
     beforeAll(() => {
-        vi.spyOn(brevo, 'sendTransacEmail').mockImplementation(async () => {
+        spyOn(brevo, 'sendTransacEmail').mockImplementation(async () => {
             return {} as any;
         });
     });
@@ -24,12 +24,13 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const result = await server.post('/api/auth/user/register').send(data);
-
+            const result = await server.post('/api/auth/user/register', data);
             expect(result.status).toEqual(HttpStatusCode.Created);
-            expect(result.body.data).toHaveProperty('token');
-            expect(result.body.data).toHaveProperty('user');
-            expect(result.body.data).toHaveProperty('expiry');
+
+            const body = await result.json();
+            expect(body.data).toHaveProperty('token');
+            expect(body.data).toHaveProperty('user');
+            expect(body.data).toHaveProperty('expiry');
         });
 
         it('should register a user with only email', async () => {
@@ -37,10 +38,11 @@ describe('User Endpoints', () => {
                 email: faker.internet.email(),
             };
 
-            const result = await server.post('/api/auth/user/register').send(data);
-
+            const result = await server.post('/api/auth/user/register', data);
             expect(result.status).toEqual(HttpStatusCode.Created);
-            expect(result.body).toMatchObject({ message: 'User registered' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'User registered' });
         });
 
         it('should fail validation', async () => {
@@ -49,10 +51,11 @@ describe('User Endpoints', () => {
                 last_name: faker.person.lastName(),
             };
 
-            const result = await server.post('/api/auth/user/register').send(data);
-
+            const result = await server.post('/api/auth/user/register', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'email is required' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'email is required' });
         });
 
         it('should fail on existing user', async () => {
@@ -60,10 +63,11 @@ describe('User Endpoints', () => {
 
             const data = { email: user.email };
 
-            const result = await server.post('/api/auth/user/register').send(data);
-
+            const result = await server.post('/api/auth/user/register', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({ message: 'User exists already' });
+
+            const body = await result.json();
+            expect(body).toMatchObject({ message: 'User exists already' });
         });
     });
 
@@ -74,10 +78,11 @@ describe('User Endpoints', () => {
 
             const data = { email: user.email, password };
 
-            const result = await server.post('/api/auth/user/login').send(data);
-
+            const result = await server.post('/api/auth/user/login', data);
             expect(result.status).toEqual(HttpStatusCode.Ok);
-            expect(result.body.data).toMatchObject({
+
+            const body = await result.json();
+            expect(body.data).toMatchObject({
                 user: { email: user.email, first_name: user.first_name, last_name: user.last_name },
                 token: expect.any(String),
                 expiry: expect.any(Number),
@@ -90,10 +95,11 @@ describe('User Endpoints', () => {
 
             const data = { email: user.email, password };
 
-            const result = await server.post('/api/auth/user/login').send(data);
-
+            const result = await server.post('/api/auth/user/login', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({
+
+            const body = await result.json();
+            expect(body).toMatchObject({
                 message: 'Set password to login',
             });
         });
@@ -104,10 +110,11 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const result = await server.post('/api/auth/user/login').send(data);
-
+            const result = await server.post('/api/auth/user/login', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({
+
+            const body = await result.json();
+            expect(body).toMatchObject({
                 message: 'Invalid email/password',
             });
         });
@@ -120,10 +127,11 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const result = await server.post('/api/auth/user/login').send(data);
-
+            const result = await server.post('/api/auth/user/login', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({
+
+            const body = await result.json();
+            expect(body).toMatchObject({
                 message: 'Invalid email/password',
             });
         });
@@ -131,58 +139,62 @@ describe('User Endpoints', () => {
         it('should fail with bad payload', async () => {
             const data = { email: faker.internet.email() };
 
-            const result = await server.post('/api/auth/user/login').send(data);
-
+            const result = await server.post('/api/auth/user/login', data);
             expect(result.status).toEqual(HttpStatusCode.BadRequest);
-            expect(result.body).toMatchObject({
+
+            const body = await result.json();
+            expect(body).toMatchObject({
                 message: 'password is required',
             });
         });
     });
 
-    describe('Confirm Email', () => {
-        it('should confirm email', async () => {
+    describe('Verify Email', () => {
+        it('should verify email', async () => {
             const { user } = await testDataService.createUser();
             const { otp } = await testDataService.createOtp({
                 model: UserModel.User,
                 model_id: user.id,
-                type: OtpType.ConfirmEmail,
+                type: OtpType.VerifyEmail,
             });
 
             const data = { code: otp.code };
 
-            const response = await server.post('/api/auth/user/confirm-email').send(data);
+            const response = await server.post('/api/auth/user/verify-email', data);
 
-            const confirmedUser = await repository.user.get({ id: user.id });
+            const verifiedUser = await repository.user.get({ id: user.id });
             const foundOtp = await repository.otp.get({
                 code: otp.code,
                 model: otp.model,
                 model_id: otp.model_id,
                 type: otp.type,
             });
-
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Email confirmed' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Email verified' });
             expect(foundOtp).toBeUndefined();
-            expect(confirmedUser.is_email_confirmed).toBeTruthy();
+            expect(verifiedUser.is_email_verified).toBeTruthy();
         });
 
         it('should return 400 with bad payload', async () => {
             const data = {};
 
-            const response = await server.post('/api/auth/user/confirm-email').send(data);
-
+            const response = await server.post('/api/auth/user/verify-email', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'code is required' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'code is required' });
         });
 
         it('should return 400 with invalid otp', async () => {
             const data = { code: faker.word.words() };
 
-            const response = await server.post('/api/auth/user/confirm-email').send(data);
-
+            const response = await server.post('/api/auth/user/verify-email', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid otp' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid otp' });
         });
     });
 
@@ -192,19 +204,21 @@ describe('User Endpoints', () => {
 
             const data = { email: user.email };
 
-            const response = await server.post('/api/auth/user/forgot-password').send(data);
-
+            const response = await server.post('/api/auth/user/forgot-password', data);
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Forgot password email sent' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Forgot password email sent' });
         });
 
         it('should return 400 with bad payload', async () => {
             const data = {};
 
-            const response = await server.post('/api/auth/user/forgot-password').send(data);
-
+            const response = await server.post('/api/auth/user/forgot-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'email is required' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'email is required' });
         });
     });
 
@@ -222,7 +236,7 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/user/reset-password').send(data);
+            const response = await server.post('/api/auth/user/reset-password', data);
 
             const updatedUser = await repository.user.get({ email: user.email });
             const foundOtp = await repository.otp.get({
@@ -233,7 +247,9 @@ describe('User Endpoints', () => {
             });
 
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Password has been reset' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Password has been reset' });
             expect(foundOtp).toBeUndefined();
             expect(passwordService.valid(data.password, updatedUser.password)).toBeTruthy();
         });
@@ -241,10 +257,11 @@ describe('User Endpoints', () => {
         it('should return 400 with bad payload', async () => {
             const data = {};
 
-            const response = await server.post('/api/auth/user/reset-password').send(data);
-
+            const response = await server.post('/api/auth/user/reset-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'code is required' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'code is required' });
         });
 
         it('should return 400 with invalid otp', async () => {
@@ -253,10 +270,11 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/user/reset-password').send(data);
-
+            const response = await server.post('/api/auth/user/reset-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid / expired otp' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid / expired otp' });
         });
 
         it('should return 400 with invalid user', async () => {
@@ -267,10 +285,11 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/user/reset-password').send(data);
-
+            const response = await server.post('/api/auth/user/reset-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid / expired otp' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid / expired otp' });
         });
     });
 
@@ -288,7 +307,7 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/user/set-password').send(data);
+            const response = await server.post('/api/auth/user/set-password', data);
 
             const updatedUser = await repository.user.get({ email: user.email, id: user.id });
             const foundOtp = await repository.otp.get({
@@ -299,7 +318,9 @@ describe('User Endpoints', () => {
             });
 
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Account password set' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Account password set' });
             expect(foundOtp).toBeUndefined();
             expect(passwordService.valid(data.password, updatedUser.password)).toBeTruthy();
         });
@@ -307,10 +328,11 @@ describe('User Endpoints', () => {
         it('should return 400 with bad payload', async () => {
             const data = {};
 
-            const response = await server.post('/api/auth/user/set-password').send(data);
-
+            const response = await server.post('/api/auth/user/set-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'code is required' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'code is required' });
         });
 
         it('should return 400 with invalid otp', async () => {
@@ -319,10 +341,11 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/user/set-password').send(data);
-
+            const response = await server.post('/api/auth/user/set-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid / expired otp' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid / expired otp' });
         });
 
         it('should return 400 with invalid user', async () => {
@@ -333,10 +356,11 @@ describe('User Endpoints', () => {
                 password: testDataService.generatePassword(),
             };
 
-            const response = await server.post('/api/auth/user/set-password').send(data);
-
+            const response = await server.post('/api/auth/user/set-password', data);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid / expired otp' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid / expired otp' });
         });
     });
 
@@ -350,15 +374,14 @@ describe('User Endpoints', () => {
                 new_password: testDataService.generatePassword(),
             };
 
-            const response = await server
-                .post('/api/auth/user/change-password')
-                .send(data)
-                .set('Authorization', `Bearer ${token}`);
+            const response = await server.post('/api/auth/user/change-password', data, token);
 
             const updatedUser = await repository.user.get({ id: user.id });
 
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Password changed' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Password changed' });
             expect(passwordService.valid(data.new_password, updatedUser.password)).toBeTruthy();
             expect(passwordService.valid(data.password, updatedUser.password)).toBeFalsy();
         });
@@ -368,13 +391,11 @@ describe('User Endpoints', () => {
 
             const data = {};
 
-            const response = await server
-                .post('/api/auth/user/change-password')
-                .send(data)
-                .set('Authorization', `Bearer ${token}`);
-
+            const response = await server.post('/api/auth/user/change-password', data, token);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'password is required' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'password is required' });
         });
 
         it('should return 400 with invalid current password', async () => {
@@ -385,41 +406,36 @@ describe('User Endpoints', () => {
                 new_password: testDataService.generatePassword(),
             };
 
-            const response = await server
-                .post('/api/auth/user/change-password')
-                .send(data)
-                .set('Authorization', `Bearer ${token}`);
-
+            const response = await server.post('/api/auth/user/change-password', data, token);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'Invalid current password' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Invalid current password' });
         });
     });
 
-    describe('Send Confirm Email Otp', () => {
-        it('should send confirm email otp', async () => {
+    describe('Send Verify Email Otp', () => {
+        it('should send verify email otp', async () => {
             const { token } = await testDataService.createUser();
 
-            const response = await server
-                .post('/api/auth/user/confirm-email-otp')
-                .set('Authorization', `Bearer ${token}`);
-
+            const response = await server.post('/api/auth/user/verify-email-otp', null, token);
             expect(response.status).toEqual(HttpStatusCode.Ok);
-            expect(response.body).toMatchObject({ message: 'Confirm email otp sent' });
+
+            const body = await response.json();
+            expect(body).toMatchObject({ message: 'Verify email otp sent' });
         });
 
-        it('should return user email is already confirmed', async () => {
-            const { token } = await testDataService.createUser({ is_email_confirmed: true });
+        it('should return user email is already verified', async () => {
+            const { token } = await testDataService.createUser({ is_email_verified: true });
 
-            const response = await server
-                .post('/api/auth/user/confirm-email-otp')
-                .set('Authorization', `Bearer ${token}`);
-
+            const response = await server.post('/api/auth/user/verify-email-otp', null, token);
             expect(response.status).toEqual(HttpStatusCode.BadRequest);
-            expect(response.body).toMatchObject({ message: 'User email is confirmed' });
+
+            const body = await response.json();
+
+            expect(body).toMatchObject({ message: 'User email is verified' });
         });
     });
 
-    afterAll(async () => {
-        await disconnectDatabase();
-    });
+    afterAll(async () => {});
 });

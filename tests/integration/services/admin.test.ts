@@ -1,8 +1,7 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { AdminService } from '../../../src/types';
-import { disconnectDatabase } from '../../utils';
 import { repository, testDataService } from '../../utils';
 import { newAdminService } from '../../../src/services';
 import { passwordService } from '../../../src/lib';
@@ -153,7 +152,5 @@ describe('Admin Service', () => {
         });
     });
 
-    afterAll(async () => {
-        await disconnectDatabase();
-    });
+    afterAll(async () => {});
 });

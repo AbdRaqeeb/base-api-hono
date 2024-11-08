@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { EmailClientService, SendEmailTemplateParams, SendEmailTextParams } from '../../../../src/types';
@@ -13,10 +13,6 @@ describe('Sendgrid Service', () => {
         emailClientService = sendgridService();
     });
 
-    afterEach(() => {
-        vi.clearAllMocks();
-    });
-
     describe('Send Text Email', () => {
         const params: SendEmailTextParams = {
             to: [faker.internet.email()],
@@ -28,7 +24,7 @@ describe('Sendgrid Service', () => {
         };
 
         it('should send text email', async () => {
-            const spy = vi.spyOn(sgMail, 'send');
+            const spy = spyOn(sgMail, 'send');
 
             await emailClientService.sendEmailText(params);
 
@@ -36,9 +32,9 @@ describe('Sendgrid Service', () => {
         });
 
         it('should log error', async () => {
-            vi.spyOn(sgMail, 'send');
+            spyOn(sgMail, 'send');
 
-            const logSpy = vi.spyOn(logger, 'error');
+            const logSpy = spyOn(logger, 'error');
 
             await emailClientService.sendEmailText(params);
 
@@ -51,14 +47,14 @@ describe('Sendgrid Service', () => {
             to: [faker.internet.email()],
             from: faker.internet.email(),
             subject: faker.word.words(),
-            emailType: EmailTypes.ConfirmEmail,
+            emailType: EmailTypes.VerifyEmail,
             templateData: { otp: '123456' },
             reply_to: faker.internet.email(),
             send_at: Date.now(),
         };
 
         it('should send text email', async () => {
-            const spy = vi.spyOn(sgMail, 'send');
+            const spy = spyOn(sgMail, 'send');
 
             await emailClientService.sendEmailTemplate(params);
 
@@ -66,9 +62,9 @@ describe('Sendgrid Service', () => {
         });
 
         it('should log error', async () => {
-            vi.spyOn(sgMail, 'send');
+            spyOn(sgMail, 'send');
 
-            const logSpy = vi.spyOn(logger, 'error');
+            const logSpy = spyOn(logger, 'error');
 
             await emailClientService.sendEmailTemplate(params);
 
@@ -78,7 +74,7 @@ describe('Sendgrid Service', () => {
 
     describe('Get Template ID', () => {
         it('should get the reset password template id', () => {
-            const result = getTemplateId(EmailTypes.ConfirmEmail);
+            const result = getTemplateId(EmailTypes.VerifyEmail);
 
             expect(result).toBeDefined();
         });

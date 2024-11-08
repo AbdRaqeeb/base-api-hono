@@ -59,8 +59,8 @@ export function mailgunService(): EmailClientService {
 
     function getTemplateId(email_type: EmailTypes) {
         switch (email_type) {
-            case EmailTypes.ConfirmEmail:
-                return 'confirm_email';
+            case EmailTypes.VerifyEmail:
+                return 'verify_email';
             case EmailTypes.ResetPassword:
                 return 'reset_password';
             default:

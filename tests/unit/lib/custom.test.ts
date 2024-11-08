@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import { faker } from '@faker-js/faker';
-import * as dateFns from 'date-fns';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, spyOn } from 'bun:test';
+import { DateTime } from 'luxon';
 
 import * as lib from '../../../src/lib';
 import { DEFAULT_SIZE, PASSWORD_REGEX } from '../../../src/constants';
@@ -176,8 +176,8 @@ describe('Custom Libraries', () => {
             it('should add pagination query', () => {
                 const query = db('test');
 
-                const offsetSpy = vi.spyOn(query, 'offset');
-                const limitSpy = vi.spyOn(query, 'limit');
+                const offsetSpy = spyOn(query, 'offset');
+                const limitSpy = spyOn(query, 'limit');
 
                 lib.addPaginationQuery(query, {});
 
@@ -195,7 +195,7 @@ describe('Custom Libraries', () => {
                 const total = 20;
                 const size = 10;
 
-                vi.spyOn(query, 'count').mockResolvedValue([{ total }]);
+                spyOn(query, 'count').mockResolvedValue([{ total }]);
 
                 const result = await lib.paginate(query, { page: '1', size: size.toString() }, data);
 
@@ -252,12 +252,12 @@ describe('Custom Libraries', () => {
     describe('Range Filter', () => {
         it('should add audit trail queries', () => {
             const filter: RangeFilter = {
-                from: new Date(),
-                to: new Date(),
+                from: new Date().toISOString(),
+                to: new Date().toISOString(),
             };
             const query = db('test');
 
-            const whereSpy = vi.spyOn(query, 'where');
+            const whereSpy = spyOn(query, 'where');
 
             lib.addRangeQuery(query, filter, 't');
 
@@ -267,12 +267,12 @@ describe('Custom Libraries', () => {
             expect(whereSpy).toHaveBeenCalledWith(
                 't.created_at',
                 '>=',
-                dateFns.format(new Date(filter.from), 'yyyy-MM-dd 00:00:00')
+                DateTime.fromISO(filter.from).toFormat('yyyy-MM-dd 00:00:00')
             );
             expect(whereSpy).toHaveBeenCalledWith(
                 't.created_at',
                 '<=',
-                dateFns.format(new Date(filter.to), 'yyyy-MM-dd 00:00:00')
+                DateTime.fromISO(filter.to).toFormat('yyyy-MM-dd 00:00:00')
             );
         });
     });

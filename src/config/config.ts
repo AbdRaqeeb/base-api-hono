@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { NODE_ENV } from '../types/enums';
 
 export interface Config {

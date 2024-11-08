@@ -1,16 +1,12 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, mock, spyOn } from 'bun:test';
 
 import logger, { logRequestMiddleware, LogService } from '../../../src/log';
 import { generateId } from '../../../src/lib';
 import { HttpStatusCode } from '../../../src/types/enums';
-import Response from '../../utils/response';
-import { NextFunction, Request as ExpressRequest, Response as ExpressResponse } from '../../../src/types';
+import { Next } from '../../../src/types';
+import { getContext } from '../../utils';
 
 describe('Logger', () => {
-    afterEach(() => {
-        vi.clearAllMocks();
-    });
-
     describe('Log Service', () => {
         it('should return the same instance', () => {
             const secondLogger = new LogService();
@@ -19,7 +15,7 @@ describe('Logger', () => {
         });
 
         it('should log info', () => {
-            const spy = vi.spyOn(logger, 'info');
+            const spy = spyOn(logger, 'info');
 
             logger.info({}, 'Info');
 
@@ -27,7 +23,7 @@ describe('Logger', () => {
         });
 
         it('should log fatal', () => {
-            const spy = vi.spyOn(logger, 'fatal');
+            const spy = spyOn(logger, 'fatal');
 
             logger.fatal(new Error('test error'), 'Fatal');
 
@@ -35,7 +31,7 @@ describe('Logger', () => {
         });
 
         it('should log error', () => {
-            const spy = vi.spyOn(logger, 'error');
+            const spy = spyOn(logger, 'error');
 
             logger.error(new Error('test error'), 'error');
 
@@ -45,7 +41,7 @@ describe('Logger', () => {
         it('should log request', () => {
             const id = generateId();
 
-            const spy = vi.spyOn(logger, 'request');
+            const spy = spyOn(logger, 'request');
 
             logger.request(id, { url: 'http://localhost:3000' });
 
@@ -55,7 +51,7 @@ describe('Logger', () => {
         it('should log response', () => {
             const id = generateId();
 
-            const spy = vi.spyOn(logger, 'response');
+            const spy = spyOn(logger, 'response');
 
             logger.response(id, HttpStatusCode.Ok, { message: 'Hello world' });
 
@@ -65,19 +61,12 @@ describe('Logger', () => {
 
     describe('Log Request Middleware', () => {
         it('should log request using middleware', () => {
-            const response = new Response() as unknown as ExpressResponse;
-            const request = {
-                route: 'test',
-                url: '/test',
-                query: {},
-                params: {},
-                headers: {},
-            } as ExpressRequest;
-            const next = vi.fn() as NextFunction;
+            const context = getContext();
+            const next = mock() as Next;
 
-            const logRequestSpy = vi.spyOn(logger, 'request');
+            const logRequestSpy = spyOn(logger, 'request');
 
-            logRequestMiddleware()(request, response, next);
+            logRequestMiddleware()(context, next);
 
             expect(logRequestSpy).toHaveBeenCalled();
             expect(next).toHaveBeenCalled();

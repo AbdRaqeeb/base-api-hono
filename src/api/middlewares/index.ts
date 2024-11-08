@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Server } from '../../types';
+import { Context, Next, Server } from '../../types';
 import { errorResponse, tokenService } from '../../lib';
 import { HttpStatusCode, Role } from '../../types/enums';
 import logger from '../../log';
@@ -13,11 +13,28 @@ export function isValidAuthorization(bearerToken: string): { token?: string; err
 }
 
 export function middleware(server: Server) {
-    async function isAuthenticatedUserJWT(req: Request, res: Response, next: NextFunction) {
+    // Grant access to specific roles
+    function authorizeAdminRole(roles: Role[]) {
+        return server.factory.createMiddleware(async (context: Context, next: Next) => {
+            const admin = context.var.admin;
+
+            if (!roles.includes(admin.role)) {
+                return errorResponse(
+                    context,
+                    HttpStatusCode.Forbidden,
+                    `Admin role ${admin.role} is not authorized to access this route`
+                );
+            }
+
+            await next();
+        });
+    }
+
+    const isAuthenticatedUserJWT = server.factory.createMiddleware(async (context: Context, next: Next) => {
         try {
-            const { error, token } = isValidAuthorization(req.headers.authorization);
+            const { error, token } = isValidAuthorization(context.req.header('Authorization'));
             if (error) {
-                return errorResponse(res, HttpStatusCode.Unauthorized, error);
+                return errorResponse(context, HttpStatusCode.Unauthorized, error);
             }
 
             const { id } = tokenService.verify(token);
@@ -25,28 +42,27 @@ export function middleware(server: Server) {
             const user = await server.userService.get({ id });
 
             if (!user) {
-                return errorResponse(res, HttpStatusCode.Unauthorized, error);
+                return errorResponse(context, HttpStatusCode.Unauthorized, error);
             }
 
-            req.user = user;
+            context.set('user', user);
 
-            return next();
+            await next();
         } catch (err) {
             logger.error(err, '[IsAuthenticatedUserJWT Error]');
 
             if (err.name === 'TokenExpiredError') {
-                return errorResponse(res, HttpStatusCode.BadRequest, 'Token expired');
+                return errorResponse(context, HttpStatusCode.BadRequest, 'Token expired');
             }
-
-            return errorResponse(res, HttpStatusCode.BadRequest, 'Not authorized to access this route');
+            return errorResponse(context, HttpStatusCode.BadRequest, 'Not authorized to access this route');
         }
-    }
+    });
 
-    async function isAuthenticatedAdminJWT(req: Request, res: Response, next: NextFunction) {
+    const isAuthenticatedAdminJWT = server.factory.createMiddleware(async (context: Context, next: Next) => {
         try {
-            const { error, token } = isValidAuthorization(req.headers.authorization);
+            const { error, token } = isValidAuthorization(context.req.header('Authorization'));
             if (error) {
-                return errorResponse(res, HttpStatusCode.Unauthorized, error);
+                return errorResponse(context, HttpStatusCode.Unauthorized, error);
             }
 
             const { id } = tokenService.verify(token);
@@ -54,36 +70,22 @@ export function middleware(server: Server) {
             const admin = await server.adminService.get({ id });
 
             if (!admin) {
-                return errorResponse(res, HttpStatusCode.Unauthorized, error);
+                return errorResponse(context, HttpStatusCode.Unauthorized, error);
             }
 
-            req.admin = admin;
+            context.set('admin', admin);
 
-            return next();
+            await next();
         } catch (err) {
             logger.error(err, '[IsAuthenticatedAdminJWT Error]');
 
             if (err.name === 'TokenExpiredError') {
-                return errorResponse(res, HttpStatusCode.BadRequest, 'Token expired');
+                return errorResponse(context, HttpStatusCode.BadRequest, 'Token expired');
             }
 
-            return errorResponse(res, HttpStatusCode.BadRequest, 'Not authorized to access this route');
+            return errorResponse(context, HttpStatusCode.BadRequest, 'Not authorized to access this route');
         }
-    }
-
-    // Grant access to specific roles
-    function authorizeAdminRole(roles: Role[]) {
-        return (req: Request, res: Response, next: NextFunction) => {
-            if (!roles.includes(req.admin.role)) {
-                return errorResponse(
-                    res,
-                    HttpStatusCode.Forbidden,
-                    `Admin role ${req.admin.role} is not authorized to access this route`
-                );
-            }
-            next();
-        };
-    }
+    });
 
     return {
         isAuthenticatedUserJWT,

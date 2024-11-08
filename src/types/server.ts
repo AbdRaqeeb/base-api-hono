@@ -1,24 +1,26 @@
-import express, { Application, Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import { Hono } from 'hono';
+import type { Context, Next } from 'hono';
+import { Factory } from 'hono/factory';
 import * as types from '../types';
 
-export interface Request extends ExpressRequest {
-    request_id: string;
-    user: types.UserResponse;
-    admin: types.AdminResponse;
-}
+type Env = {
+    Variables: {
+        user: types.UserResponse;
+        admin: types.AdminResponse;
+    };
+};
 
-export interface Response extends ExpressResponse {
-    request_id: string;
-}
+type App = Hono<Env>;
+type Router = Hono<Env>;
 
 export interface Server {
-    app: Application;
+    app: App;
+    factory: Factory<Env>;
     userService: types.UserService;
     otpService: types.OtpService;
     emailService: types.EmailService;
     adminService: types.AdminService;
 }
 
-export { Router, NextFunction, Application } from 'express';
 export { Server as HttpServer } from 'http';
-export { express };
+export { Hono, Next, Context, Env, Router, App };

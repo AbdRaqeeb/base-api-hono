@@ -1,9 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { OtpCreate, OtpRepository } from '../../../src/types';
 import { newOtpRepository } from '../../../src/repositories';
-import { DB, disconnectDatabase, testDataService } from '../../utils';
+import { DB, testDataService } from '../../utils';
 import { OtpType, UserModel } from '../../../src/types/enums';
 
 describe('Otp Repository', () => {
@@ -57,7 +57,7 @@ describe('Otp Repository', () => {
             const result = await otpRepository.get({
                 model: otp.model,
                 model_id: otp.model_id,
-                type: OtpType.ConfirmEmail,
+                type: OtpType.VerifyEmail,
                 code: faker.number.int({ min: 1, max: 100 }).toString(),
             });
 
@@ -83,9 +83,5 @@ describe('Otp Repository', () => {
 
             expect(result).toBeUndefined();
         });
-    });
-
-    afterAll(async () => {
-        await disconnectDatabase();
     });
 });

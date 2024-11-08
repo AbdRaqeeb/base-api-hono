@@ -22,8 +22,8 @@ export interface PaginationResponse<T> {
 
 export interface RangeFilter {
     search?: string;
-    from?: Date;
-    to?: Date;
+    from?: string;
+    to?: string;
 }
 
 export type CalculatedPaginationData = {
@@ -55,7 +55,7 @@ export type SetPasswordSchema = {
     password: string;
 };
 
-export type ConfirmEmailSchema = {
+export type VerifyEmailSchema = {
     code: string;
 };
 

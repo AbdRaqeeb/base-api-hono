@@ -16,8 +16,8 @@ export function createPgAdapter(connection: DatabaseAdapterOptions): Knex {
         client: 'pg',
         connection,
         pool: connection.pool || {
-            min: Config.nodeEnv === 'test' ? 0 : 3,
-            max: Config.nodeEnv === 'test' ? 1 : 10,
+            min: 3,
+            max: 10,
         },
         debug: Config.nodeEnv === 'development', // 'local'?
         asyncStackTraces: Config.nodeEnv !== 'production',
