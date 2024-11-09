@@ -24,7 +24,7 @@ describe('Sendgrid Service', () => {
         };
 
         it('should send text email', async () => {
-            const spy = spyOn(sgMail, 'send');
+            const spy = spyOn(sgMail, 'send').mockImplementation(() => {});
 
             await emailClientService.sendEmailText(params);
 
@@ -54,7 +54,7 @@ describe('Sendgrid Service', () => {
         };
 
         it('should send text email', async () => {
-            const spy = spyOn(sgMail, 'send');
+            const spy = spyOn(sgMail, 'send').mockImplementation(() => {});
 
             await emailClientService.sendEmailTemplate(params);
 
