@@ -4,7 +4,7 @@
     "description": "",
     "main": "src/index.ts",
     "scripts": {
-        "prepare": "node .husky/install.mjs",
+        "prepare": "bun .husky/install.mjs",
         "test": "bun --env-file=.env.test test",
         "test:watch": "bun --env-file=.env.test test --watch",
         "test:coverage": "bun --env-file=.env.test test --coverage",
@@ -14,7 +14,7 @@
         "lint": "eslint . --ext .js --ext .ts",
         "lint:fix": "eslint . --ext .js --ext .ts --fix",
         "type:check": "bunx tsc --project tsconfig.json --noEmit",
-        "ci:check": "yarn run lint && yarn run type:check && yarn run test"
+        "ci:check": "bun lint && bun type:check && bun test"
     },
     "repository": {
         "type": "git",
