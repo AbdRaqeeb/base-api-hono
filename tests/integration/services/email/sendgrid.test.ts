@@ -24,7 +24,9 @@ describe('Sendgrid Service', () => {
         };
 
         it('should send text email', async () => {
-            const spy = spyOn(sgMail, 'send').mockImplementation(() => {});
+            const spy = spyOn(sgMail, 'send').mockImplementation(() => {
+                return {} as any;
+            });
 
             await emailClientService.sendEmailText(params);
 
@@ -54,7 +56,9 @@ describe('Sendgrid Service', () => {
         };
 
         it('should send text email', async () => {
-            const spy = spyOn(sgMail, 'send').mockImplementation(() => {});
+            const spy = spyOn(sgMail, 'send').mockImplementation(() => {
+                return {} as any;
+            });
 
             await emailClientService.sendEmailTemplate(params);
 
@@ -62,7 +66,9 @@ describe('Sendgrid Service', () => {
         });
 
         it('should log error', async () => {
-            spyOn(sgMail, 'send');
+            spyOn(sgMail, 'send').mockImplementation(() => {
+                return {} as any;
+            });
 
             const logSpy = spyOn(logger, 'error');
 
