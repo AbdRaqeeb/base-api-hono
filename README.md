@@ -6,6 +6,7 @@ This is a customizable starter api application built using [Bun](https://bun.sh)
 
 -   Rest API
 -   Database (postgres) Configurable to desired database
+-   Database migration setup using knex
 -   Logging (pino)
 -   Tests (Unit, Integration and e2e)
 -   Docker
@@ -90,3 +91,33 @@ Test Coverage
 ```bash
     bun test:coverage
 ```
+
+## Database Migration
+
+Creating a new migration file
+
+```bash
+    make migrate-add ARGS={{migration_file_name}}
+    
+    # E.g
+     make migrate-add ARGS=add_users_table
+     
+     # If make is not available, the commands used are in the `Makefile` file in the root directory
+     bunx knex migrate:make {{migration_file_name}} --knexfile ./knex/knexfile.ts -x ts
+```
+
+Migrating new migration files or database changes
+
+```bash
+    make migrate-run
+    
+    # test database
+    make migrate-run-test
+    
+    # make not available
+    bun --env-file .env.local knex migrate:latest --knexfile ./knex/knexfile.ts
+    
+    # make not available - test
+    bun --env-file .env.local knex migrate:rollback --knexfile ./knex/knexfile.ts --env test
+```
+

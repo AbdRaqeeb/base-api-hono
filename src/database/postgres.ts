@@ -22,7 +22,7 @@ export function createPgAdapter(connection: DatabaseAdapterOptions): Knex {
         debug: Config.nodeEnv === 'development', // 'local'?
         asyncStackTraces: Config.nodeEnv !== 'production',
         useNullAsDefault: true,
-        searchPath: [Config.databaseSchema, 'public'],
+        searchPath: [...Config.databaseSchemas, 'public'],
         log: {
             warn(message) {
                 logger.info(message, '[KNEX][WARN]');

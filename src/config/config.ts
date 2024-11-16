@@ -4,7 +4,7 @@ export interface Config {
     port: number;
     nodeEnv: NODE_ENV;
     databaseUrl: string;
-    databaseSchema: string;
+    databaseSchemas: string[];
     liveTailSourceToken: string;
     jwtSecret: string;
     jwtExpiry: string;
@@ -15,7 +15,7 @@ export interface Config {
 }
 
 export const getConfig = (): Config => {
-    const required: string[] = ['NODE_ENV', 'DATABASE_URL', 'DATABASE_SCHEMA'];
+    const required: string[] = ['NODE_ENV', 'DATABASE_URL', 'DATABASE_SCHEMAS'];
 
     if (!process.env.CI) {
         // Do not require this check in CI
@@ -28,7 +28,7 @@ export const getConfig = (): Config => {
         port: Number(process.env.PORT) || 6050,
         nodeEnv: (process.env.NODE_ENV as NODE_ENV) || NODE_ENV.DEVELOPMENT,
         databaseUrl: process.env.DATABASE_URL,
-        databaseSchema: process.env.DATABASE_SCHEMA,
+        databaseSchemas: process.env.DATABASE_SCHEMAS?.split(','),
         liveTailSourceToken: process.env.LIVE_TAIL_SOURCE_TOKEN || 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         jwtSecret: process.env.JWT_SECRET || 'woohoo',
         jwtExpiry: process.env.JWT_EXPIRY || '2d',
