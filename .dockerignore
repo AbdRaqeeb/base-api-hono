@@ -18,3 +18,4 @@ setup-test.node.ts
 vitest.config.ts
 coverage/
 tests/
+knex/
