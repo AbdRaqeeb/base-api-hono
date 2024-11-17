@@ -276,4 +276,53 @@ describe('Custom Libraries', () => {
             );
         });
     });
+
+    describe('Extract Field Names', () => {
+        it('should extract correct field names from various inputs', () => {
+            const fields = [
+                'a.id as id',
+                'a.first_name as first_name',
+                'b.email as email',
+                'c.complex_column as alias',
+                'd.simple',
+                'e.table.column',
+            ];
+
+            const result = lib.extractFieldNames(fields);
+
+            expect(result).toEqual(['id', 'first_name', 'email', 'complex_column', 'simple', 'column']);
+        });
+
+        it('should handle fields without aliases', () => {
+            const fields = ['a.id', 'b.name'];
+
+            const result = lib.extractFieldNames(fields);
+
+            expect(result).toEqual(['id', 'name']);
+        });
+
+        it('should handle empty input', () => {
+            const fields: string[] = [];
+
+            const result = lib.extractFieldNames(fields);
+
+            expect(result).toEqual([]);
+        });
+
+        it('should handle fields with multiple dots', () => {
+            const fields = ['schema.table.column as alias'];
+
+            const result = lib.extractFieldNames(fields);
+
+            expect(result).toEqual(['column']);
+        });
+
+        it('should handle fields with spaces in alias', () => {
+            const fields = ['a.column as "complex alias"'];
+
+            const result = lib.extractFieldNames(fields);
+
+            expect(result).toEqual(['column']);
+        });
+    });
 });

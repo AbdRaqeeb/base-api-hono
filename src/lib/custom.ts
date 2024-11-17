@@ -160,3 +160,10 @@ export const bodyParser = createMiddleware(async (context: Context, next: Next) 
 
     await next();
 });
+
+export function extractFieldNames(fields: string[]): string[] {
+    return fields.map((field) => {
+        const parts = field.split(' as ');
+        return parts[0].split('.').pop() || '';
+    });
+}

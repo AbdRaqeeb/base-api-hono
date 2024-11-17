@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 
 import { User, UserCreate, UserFilter, UserRepository, UserUpdate } from '../types';
 import { USERS } from '../database';
-import { addPaginationQuery, addRangeQuery } from '../lib';
+import * as lib from '../lib';
 
 interface UserStore {
     DB: Knex;
@@ -10,7 +10,7 @@ interface UserStore {
 
 export function newUserRepository(us: UserStore): UserRepository {
     async function create(data: UserCreate): Promise<User> {
-        const [result] = await us.DB(USERS).insert(data, '*');
+        const [result] = await us.DB(USERS).insert(data).returning(lib.extractFieldNames(fields));
         return result;
     }
 
@@ -27,20 +27,19 @@ export function newUserRepository(us: UserStore): UserRepository {
     }
 
     async function update(filter: UserFilter, data: UserUpdate): Promise<User> {
-        await us.DB(USERS).where(filter).update(data);
-
-        return get(filter);
+        const [result] = await us.DB(USERS).where(filter).update(data).returning(lib.extractFieldNames(fields));
+        return result;
     }
 
     function query(filter: UserFilter): Knex.QueryBuilder {
-        return findUserBaseQuery(us.DB, filter).groupBy('u.created_at');
+        return findUserBaseQuery(us.DB, filter);
     }
 
     return { create, get, list, remove, update, query };
 }
 
 function findUserBaseQuery(db: Knex, filter: UserFilter): Knex.QueryBuilder {
-    const query = db(`${USERS} as u`).orderBy('u.created_at', 'desc');
+    let query = db(`${USERS} as u`);
 
     if (filter.id) query.where('u.id', filter.id);
     if (filter.age_range) query.where('u.age_range', filter.age_range);
@@ -56,19 +55,17 @@ function findUserBaseQuery(db: Knex, filter: UserFilter): Knex.QueryBuilder {
                 .orWhereRaw('LOWER(u.email) LIKE ?', [`%${filter.search.toLowerCase()}%`]);
         });
 
+    // add range query
+    query = lib.addRangeQuery(query, filter, 'u');
+
     return query;
 }
 
 function findUserQuery(db: Knex, filter: UserFilter): Knex.QueryBuilder {
-    let query = findUserBaseQuery(db, filter);
-
-    // add range query
-    query = addRangeQuery(query, filter, 'u');
-
-    // add pagination query
-    query = addPaginationQuery(query, filter);
-
+    let query = findUserBaseQuery(db, filter).orderBy('u.created_at', 'desc');
+    query = lib.addPaginationQuery(query, filter); // add pagination query
     query.select(fields);
+
     return query;
 }
 

@@ -11,7 +11,10 @@ interface OtpStore {
 export function newOtpRepository(os: OtpStore): OtpRepository {
     async function create(data: OtpCreate): Promise<Otp> {
         const code = generateOtp();
-        const [result] = await os.DB(OTPS).insert({ ...data, code }, '*');
+        const [result] = await os
+            .DB(OTPS)
+            .insert({ ...data, code })
+            .returning(fields);
 
         return result;
     }
@@ -25,7 +28,7 @@ export function newOtpRepository(os: OtpStore): OtpRepository {
                     .andWhere('model', filter.model)
                     .andWhere('expires_at', '>', os.DB.raw('NOW()'));
             })
-            .first('*');
+            .first(fields);
 
         if (filter.model_id) query.where('model_id', filter.model_id);
 
@@ -38,3 +41,5 @@ export function newOtpRepository(os: OtpStore): OtpRepository {
 
     return { create, get, remove };
 }
+
+const fields = ['id', 'code', 'type', 'model', 'model_id', 'expires_at', 'created_at'];

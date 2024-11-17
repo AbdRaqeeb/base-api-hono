@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 
 import { Admin, AdminCheck, AdminCreate, AdminFilter, AdminRepository, AdminUpdate } from '../types';
 import { ADMINS } from '../database';
-import { addPaginationQuery, addRangeQuery } from '../lib';
+import * as lib from '../lib';
 
 interface AdminStore {
     DB: Knex;
@@ -10,7 +10,7 @@ interface AdminStore {
 
 export function newAdminRepository(as: AdminStore): AdminRepository {
     async function create(data: AdminCreate): Promise<Admin> {
-        const [result] = await as.DB(ADMINS).insert(data, '*');
+        const [result] = await as.DB(ADMINS).insert(data).returning(lib.extractFieldNames(fields));
         return result;
     }
 
@@ -23,9 +23,8 @@ export function newAdminRepository(as: AdminStore): AdminRepository {
     }
 
     async function update(filter: AdminFilter, data: AdminUpdate): Promise<Admin> {
-        await as.DB(ADMINS).where(filter).update(data);
-
-        return get(filter);
+        const [result] = await as.DB(ADMINS).where(filter).update(data).returning(lib.extractFieldNames(fields));
+        return result;
     }
 
     async function list(filter: AdminFilter): Promise<Admin[]> {
@@ -33,7 +32,7 @@ export function newAdminRepository(as: AdminStore): AdminRepository {
     }
 
     function query(filter: AdminFilter): Knex.QueryBuilder {
-        return findAdminBaseQuery(as.DB, filter).groupBy('a.created_at');
+        return findAdminBaseQuery(as.DB, filter);
     }
 
     async function check(filter: AdminCheck): Promise<{ id: number }> {
@@ -44,7 +43,7 @@ export function newAdminRepository(as: AdminStore): AdminRepository {
 }
 
 function findAdminBaseQuery(db: Knex, filter: AdminFilter): Knex.QueryBuilder {
-    const query = db(`${ADMINS} as a`).orderBy('a.created_at', 'desc');
+    let query = db(`${ADMINS} as a`);
 
     if (filter.id) query.where('a.id', filter.id);
     if (filter.email) query.whereRaw(`LOWER(a.email) = ?`, [filter.email.toLowerCase()]);
@@ -69,18 +68,15 @@ function findAdminBaseQuery(db: Knex, filter: AdminFilter): Knex.QueryBuilder {
                 .orWhereRaw('LOWER(a.email) LIKE ?', [`%${filter.search.toLowerCase()}%`]);
         });
 
+    // add range query
+    query = lib.addRangeQuery(query, filter, 'a');
+
     return query;
 }
 
 function findAdminQuery(db: Knex, filter: AdminFilter): Knex.QueryBuilder {
-    let query = findAdminBaseQuery(db, filter);
-
-    // add range query
-    query = addRangeQuery(query, filter, 'a');
-
-    // add pagination query
-    query = addPaginationQuery(query, filter);
-
+    let query = findAdminBaseQuery(db, filter).orderBy('a.created_at', 'desc');
+    query = lib.addPaginationQuery(query, filter); // add pagination query
     query.select(fields);
 
     return query;
