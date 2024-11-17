@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { afterAll, beforeAll, describe, expect, it, spyOn } from 'bun:test';
+import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 
 import { repository, server, testDataService } from '../../utils';
 import { HttpStatusCode, OtpType, Role, UserModel } from '../../../src/types/enums';
@@ -338,6 +338,4 @@ describe('Admin Endpoints', () => {
             expect(body).toMatchObject({ message: 'Invalid current password' });
         });
     });
-
-    afterAll(async () => {});
 });

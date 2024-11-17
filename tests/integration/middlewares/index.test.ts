@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it } from 'bun:test';
+import { describe, expect, it } from 'bun:test';
 
 import { server, testDataService } from '../../utils';
 import { HttpStatusCode } from '../../../src/types/enums';
@@ -53,6 +53,4 @@ describe('Middlewares', () => {
             expect(body.message).toBe('Not authorized to access this route');
         });
     });
-
-    afterAll(async () => {});
 });

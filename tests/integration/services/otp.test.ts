@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
+import { beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { OtpCreate, OtpService } from '../../../src/types';
@@ -79,6 +79,4 @@ describe('Otp Service', () => {
             expect(result).toBeUndefined();
         });
     });
-
-    afterAll(async () => {});
 });

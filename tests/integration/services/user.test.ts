@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { UserService } from '../../../src/types';
@@ -135,6 +135,4 @@ describe('User Service', () => {
             expect(result).toBeUndefined();
         });
     });
-
-    afterAll(async () => {});
 });

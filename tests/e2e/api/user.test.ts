@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { afterAll, beforeAll, describe, expect, it, spyOn } from 'bun:test';
+import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 
 import { repository, server, testDataService } from '../../utils';
 import { AgeRange, HttpStatusCode, OtpType, UserModel } from '../../../src/types/enums';
@@ -436,6 +436,4 @@ describe('User Endpoints', () => {
             expect(body).toMatchObject({ message: 'User email is verified' });
         });
     });
-
-    afterAll(async () => {});
 });

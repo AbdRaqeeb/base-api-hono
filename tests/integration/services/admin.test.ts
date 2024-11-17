@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
+import { beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { AdminService } from '../../../src/types';
@@ -151,6 +151,4 @@ describe('Admin Service', () => {
             expect(result).toBeUndefined();
         });
     });
-
-    afterAll(async () => {});
 });
