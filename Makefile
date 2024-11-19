@@ -22,4 +22,13 @@ migrate-rollback-test:
 migrate-rollback-all-test:
 	bun --env-file .env.test knex migrate:rollback --all --knexfile ./knex/knexfile.ts --env test
 
+seed-add:
+	bunx knex seed:make $(ARGS) --knexfile ./knex/knexfile.ts --timestamp-filename-prefix -x ts
+
+seed-run:
+	bun --env-file .env.local knex seed:run --knexfile ./knex/knexfile.ts
+
+seed-run-test:
+	bun --env-file .env.test knex seed:run --knexfile ./knex/knexfile.ts --env test
+
 .PHONY: dev build test
