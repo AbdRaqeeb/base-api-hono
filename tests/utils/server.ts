@@ -32,7 +32,7 @@ function buildTestServer() {
     }
 
     async function put(url: string, body?: UnknownObject, token?: string, customHeaders?: UnknownObject) {
-        return request({ method: 'POST', url, body, token, customHeaders });
+        return request({ method: 'PUT', url, body, token, customHeaders });
     }
 
     async function get(url: string, token?: string, customHeaders?: UnknownObject) {
