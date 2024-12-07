@@ -19,16 +19,6 @@ export enum NODE_ENV {
     TEST = 'test',
 }
 
-export enum LogLevels {
-    fatal = 'fatal',
-    error = 'error',
-    warn = 'warn',
-    info = 'info',
-    debug = 'debug',
-    trace = 'trace',
-    silent = 'silent',
-}
-
 export enum AgeRange {
     CHILD = '0-12',
     TEENAGER = '13-19',
@@ -38,22 +28,22 @@ export enum AgeRange {
 }
 
 export enum EmailClient {
-    Mailgun = 'Mailgun',
-    Sendgrid = 'Sendgrid',
-    Brevo = 'Brevo',
+    Resend = 'resend',
+    Sendgrid = 'sendgrid',
+    Brevo = 'brevo',
+    Nodemailer = 'nodemailer',
 }
 
 export enum EmailTypes {
+    WelcomeEmail = 'welcome-email',
     VerifyEmail = 'verify-email',
-    ResetPassword = 'reset-password',
-    SetPassword = 'set-password',
-    AdminCredentials = 'admin-credentials',
+    ForgotPassword = 'forgot-password',
 }
 
 export enum OtpType {
     ResetPassword = 'reset-password',
     VerifyEmail = 'verify-email',
-    SetPassword = 'set-password',
+    ForgotPassword = 'forgot-password',
 }
 
 export enum UserModel {

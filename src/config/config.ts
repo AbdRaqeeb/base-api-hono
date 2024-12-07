@@ -8,10 +8,18 @@ export interface Config {
     liveTailSourceToken: string;
     jwtSecret: string;
     jwtExpiry: string;
-    mailgunApiKey: string;
-    mailgunDomainName: string;
     sendGridApiKey: string;
     brevoApiKey: string;
+    resendApiKey: string;
+    smtp: {
+        host: string;
+        port: number;
+        secure: boolean;
+        auth: {
+            user: string;
+            pass: string;
+        };
+    }
 }
 
 export const getConfig = (): Config => {
@@ -32,9 +40,17 @@ export const getConfig = (): Config => {
         liveTailSourceToken: process.env.LIVE_TAIL_SOURCE_TOKEN || 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         jwtSecret: process.env.JWT_SECRET || 'woohoo',
         jwtExpiry: process.env.JWT_EXPIRY || '2d',
-        mailgunApiKey: process.env.MAILGUN_API_KEY || 'xxxxxxxxxxxxxxxxxxxxx',
-        mailgunDomainName: process.env.MAILGUN_DOMAIN_NAME || 'domain',
         sendGridApiKey: process.env.SENDGRID_API_KEY || 'SG.xxxxxxxxxxxxxxxxx',
         brevoApiKey: process.env.BREVO_API_KEY || 'xxxxxxxxxxxxxxxxxx',
+        resendApiKey: process.env.RESEND_API_KEY || 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        smtp: {
+            host: process.env.SMTP_HOST ||'smtp.example.com',
+            port: Number(process.env.SMTP_PORT) || 587,
+            secure: process.env.SMTP_SECURE === '1',
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASSWORD,
+            },
+        }
     };
 };
