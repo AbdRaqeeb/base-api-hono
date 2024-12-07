@@ -1,6 +1,5 @@
 import './config';
 import logger from './log';
-import { DateTime } from 'luxon';
 import { createNewServer } from './api';
 import Config from './config';
 import project from './project';
@@ -11,7 +10,7 @@ export default {
 };
 
 if (Config.nodeEnv === 'development') {
-    logger.info({}, `${project.name} server is LIVE ⚡️🔥 at port ${Config.port}`);
+    logger.info(`${project.name} server is LIVE ⚡️🔥 at port ${Config.port}`);
 }
 
 process.on('uncaughtException', (err: Error) => {
@@ -26,11 +25,11 @@ process.on('unhandledRejection', (err: Error) => {
 
 // Handle shutdown gracefully
 process.on('SIGTERM', () => {
-    logger.info({ time: DateTime.now().toISO() }, '[SIGTERM] Signal received, shutting down...');
+    logger.info('[SIGTERM] SIGTERM signal received, shutting down...');
     process.exit(0);
 });
 
 process.on('SIGINT', () => {
-    logger.info({ time: DateTime.now().toISO() }, '[SIGINT] Signal received, shutting down...');
+    logger.info('[SIGINT] SIGINT signal received, shutting down...');
     process.exit(0);
 });

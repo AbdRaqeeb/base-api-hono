@@ -1,4 +1,4 @@
-import { Context } from '../types';
+import { Context } from 'hono';
 import { HttpStatusCode } from '../types/enums';
 import logger from '../log';
 
@@ -10,7 +10,7 @@ export const errorResponse = (
     data?: any
 ) => {
     const response = { message, data };
-    logger.response(context.get('requestId'), statusCode, { message });
+    logger.info(context.get('requestId'), statusCode, { message });
     context.status(statusCode);
 
     return context.json(response);
@@ -21,7 +21,7 @@ export const serverErrorResponse = (context: Context, source: string, err: Error
 
     const response = { message: 'Internal Server Error' };
 
-    logger.response(context.get('requestId'), HttpStatusCode.InternalServerError, response);
+    logger.info(context.get('requestId'), HttpStatusCode.InternalServerError, response);
 
     context.status(HttpStatusCode.InternalServerError);
 
@@ -31,7 +31,7 @@ export const serverErrorResponse = (context: Context, source: string, err: Error
 export const successResponse = (context: Context, statusCode: HttpStatusCode, message: string, data?: any) => {
     const response = { message, data };
 
-    logger.response(context.get('requestId'), statusCode, { message });
+    logger.info(context.get('requestId'), statusCode, { message });
     context.status(statusCode);
 
     return context.json(response);
