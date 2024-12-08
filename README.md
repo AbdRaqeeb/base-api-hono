@@ -1,17 +1,17 @@
 # Base API (Hono)
 
-This is a customizable starter api application built using [Bun](https://bun.sh) and [Hono](https://hono.dev).
+This is a customizable starter api application built using [BetterAuth](https://www.better-auth.com), [Bun](https://bun.sh) and [Hono](https://hono.dev).
 
 ## Features
 
 - Rest API
+- Authentication (BetterAuth)
 - Database (postgres) Configurable to desired database
 - Database migration setup using knex
 - Logging (pino)
 - Tests (Unit, Integration and e2e)
 - Docker
-- Linting
-- Code formatting
+- Formatting & Linting (Biome)
 - Dependency Inject Architecture
 
 ## Project Setup
