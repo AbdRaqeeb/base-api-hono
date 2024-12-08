@@ -4,7 +4,7 @@ import { WelcomeEmailProps } from '../../../types';
 export const WelcomeEmail = ({
     userName = 'John',
     dashboardLink = 'https://dashboard.example.com',
-    appName = 'Base API'
+    appName = 'Base API',
 }: WelcomeEmailProps) => {
     return (
         <Html>

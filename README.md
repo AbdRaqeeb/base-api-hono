@@ -4,15 +4,15 @@ This is a customizable starter api application built using [Bun](https://bun.sh)
 
 ## Features
 
--   Rest API
--   Database (postgres) Configurable to desired database
--   Database migration setup using knex
--   Logging (pino)
--   Tests (Unit, Integration and e2e)
--   Docker
--   Linting
--   Code formatting
--   Dependency Inject Architecture
+- Rest API
+- Database (postgres) Configurable to desired database
+- Database migration setup using knex
+- Logging (pino)
+- Tests (Unit, Integration and e2e)
+- Docker
+- Linting
+- Code formatting
+- Dependency Inject Architecture
 
 ## Project Setup
 

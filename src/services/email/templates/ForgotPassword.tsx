@@ -1,10 +1,7 @@
 import { Body, Container, Head, Heading, Html, Preview, Section, Text, Hr } from '@react-email/components';
 import { ForgotPasswordEmailProps } from '../../../types';
 
-export const ForgotPasswordEmail = ({
-    otp = '123456',
-    otpExpiry = '10 minutes',
-}: ForgotPasswordEmailProps) => {
+export const ForgotPasswordEmail = ({ otp = '123456', otpExpiry = '10 minutes' }: ForgotPasswordEmailProps) => {
     return (
         <Html>
             <Head />
