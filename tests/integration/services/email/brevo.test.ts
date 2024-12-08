@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
+import { request } from '../../../../src/lib';
+import logger from '../../../../src/log';
 import { brevoService } from '../../../../src/services/email/brevo';
 import { EmailClientService, SendEmailParams } from '../../../../src/types';
-import logger from '../../../../src/log';
-import { request } from '../../../../src/lib';
 
 describe('Brevo Service', () => {
     let emailService: EmailClientService;

@@ -1,5 +1,0 @@
-dist/
-node_modules/
-lint-staged.config.mjs
-setup-test.node.ts
-vitest.config.ts

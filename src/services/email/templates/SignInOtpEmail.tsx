@@ -1,4 +1,4 @@
-import { Body, Container, Head, Heading, Html, Preview, Section, Text, Hr } from '@react-email/components';
+import { Body, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components';
 import { SignInOtpEmailProps } from '../../../types';
 
 export const SignInOtpEmail = ({ otp = '123456', otpExpiry = '5 minutes' }: SignInOtpEmailProps) => {
@@ -91,21 +91,21 @@ const otpText = {
     margin: '0',
 };
 
-const infoContainer = {
+const _infoContainer = {
     background: '#f9fafb',
     borderRadius: '6px',
     padding: '16px',
     margin: '20px 0',
 };
 
-const infoHeader = {
+const _infoHeader = {
     color: '#1a1a1a',
     fontSize: '14px',
     fontWeight: '600',
     margin: '0 0 8px',
 };
 
-const infoText = {
+const _infoText = {
     color: '#666666',
     fontSize: '14px',
     margin: '4px 0',

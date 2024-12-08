@@ -1,7 +1,7 @@
 import './config';
-import logger from './log';
 import { createNewServer } from './api';
 import Config from './config';
+import logger from './log';
 import project from './project';
 
 export default {

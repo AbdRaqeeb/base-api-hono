@@ -1,7 +1,7 @@
 import nodemailer, { SendMailOptions } from 'nodemailer';
-import { EmailClientService, SendEmailParams } from '../../types';
 import Config from '../../config';
 import logger from '../../log';
+import { EmailClientService, SendEmailParams } from '../../types';
 
 const transporter = nodemailer.createTransport({
     host: Config.smtp.host,

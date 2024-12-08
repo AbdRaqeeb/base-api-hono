@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
-import { EmailClientService, SendEmailParams } from '../../../../src/types';
-import { sendgridService } from '../../../../src/services/email/sendgrid';
-import logger from '../../../../src/log';
 import { request } from '../../../../src/lib';
+import logger from '../../../../src/log';
+import { sendgridService } from '../../../../src/services/email/sendgrid';
+import { EmailClientService, SendEmailParams } from '../../../../src/types';
 
 describe('Sendgrid Service', () => {
     let emailClientService: EmailClientService;

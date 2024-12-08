@@ -1,9 +1,9 @@
-import { EmailTypes } from '../../../types/enums';
-import { EmailTypeParams } from '../../../types';
 import { render } from '@react-email/components';
-import WelcomeEmail from './WelcomeEmail';
-import VerifyEmail from './VerifyEmail';
+import { EmailTypeParams } from '../../../types';
+import { EmailTypes } from '../../../types/enums';
 import ForgotPassword from './ForgotPassword';
+import VerifyEmail from './VerifyEmail';
+import WelcomeEmail from './WelcomeEmail';
 
 export function getEmailHtml<T extends EmailTypes>(emailType: T, emailTypeParams: EmailTypeParams[T]): Promise<string> {
     if (emailType === EmailTypes.WelcomeEmail) {

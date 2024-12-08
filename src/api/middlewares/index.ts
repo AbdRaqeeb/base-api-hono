@@ -9,7 +9,6 @@ export function isValidAuthorization(bearerToken: string): { token?: string; err
     return { token };
 }
 
-// eslint-disable-next-line
-export function middleware(server: Server) {
+export function middleware(_server: Server) {
     return {};
 }

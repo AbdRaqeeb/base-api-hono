@@ -1,9 +1,9 @@
 import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
-import { EmailClientService, SendEmailParams } from '../../../../src/types';
-import { nodemailerService, transporter } from '../../../../src/services/email/nodemailer';
 import logger from '../../../../src/log';
+import { nodemailerService, transporter } from '../../../../src/services/email/nodemailer';
+import { EmailClientService, SendEmailParams } from '../../../../src/types';
 
 describe('Nodemailer Service', () => {
     let emailClientService: EmailClientService;

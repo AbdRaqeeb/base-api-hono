@@ -1,9 +1,9 @@
-import { describe, it, expect, spyOn } from 'bun:test';
+import { describe, expect, it, spyOn } from 'bun:test';
 
-import { getContext } from '../../utils';
 import { errorResponse, serverErrorResponse, successResponse } from '../../../src/lib';
 import logger from '../../../src/log';
 import { HttpStatusCode } from '../../../src/types/enums';
+import { getContext } from '../../utils';
 
 describe('Response Library', () => {
     describe('Error Response', () => {

@@ -1,6 +1,6 @@
-import * as types from '../types';
-import { paginate } from '../lib';
 import { DEFAULT_SIZE } from '../constants';
+import { paginate } from '../lib';
+import * as types from '../types';
 
 export function newUserService(us: types.UserRepository): types.UserService {
     async function create(data: types.UserCreate): Promise<types.UserResponse> {

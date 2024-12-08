@@ -1,16 +1,16 @@
 import { cors } from 'hono/cors';
-import { requestId } from 'hono/request-id';
 import { createFactory } from 'hono/factory';
+import { requestId } from 'hono/request-id';
 
-import { Env, Hono, Server } from '../types';
+import * as httpServices from '../api';
 import { connection, createPgAdapter } from '../database';
+import * as lib from '../lib';
+import { logRequestMiddleware } from '../log';
+import project from '../project';
 import { createRepositories } from '../repositories';
 import * as services from '../services';
-import * as lib from '../lib';
-import * as httpServices from '../api';
-import project from '../project';
+import { Env, Hono, Server } from '../types';
 import { HttpStatusCode } from '../types/enums';
-import { logRequestMiddleware } from '../log';
 
 const startNewApplication = () => {
     const factory = createFactory<Env>();

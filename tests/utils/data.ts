@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker';
 import * as jwt from 'jsonwebtoken';
 
-import * as types from '../../src/types';
-import { createRepositories } from '../../src/repositories';
-import { DB } from './postgres';
 import { PASSWORD_REGEX } from '../../src/constants';
 import { generateRandomString, tokenService } from '../../src/lib';
+import { createRepositories } from '../../src/repositories';
+import * as types from '../../src/types';
+import { DB } from './postgres';
 
 export const repository = createRepositories(DB);
 

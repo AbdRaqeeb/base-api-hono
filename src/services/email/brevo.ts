@@ -1,8 +1,8 @@
 import Config from '../../config';
-import { EmailClientService, EmailUser, SendEmailParams } from '../../types';
-import logger from '../../log';
 import { FROM_NAME } from '../../constants';
 import { request } from '../../lib';
+import logger from '../../log';
+import { EmailClientService, EmailUser, SendEmailParams } from '../../types';
 
 export function brevoService(): EmailClientService {
     async function send(params: SendEmailParams): Promise<void> {

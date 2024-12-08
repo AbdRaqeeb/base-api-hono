@@ -1,7 +1,7 @@
-import { EmailClientService, EmailUser, SendEmailParams } from '../../types';
 import Config from '../../config';
-import logger from '../../log';
 import { request } from '../../lib';
+import logger from '../../log';
+import { EmailClientService, EmailUser, SendEmailParams } from '../../types';
 
 export function sendgridService(): EmailClientService {
     async function send(params: SendEmailParams): Promise<void> {

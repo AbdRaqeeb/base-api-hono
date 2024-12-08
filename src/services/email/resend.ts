@@ -1,7 +1,7 @@
-import { EmailClientService, SendEmailParams } from '../../types';
 import Config from '../../config';
-import logger from '../../log';
 import { request } from '../../lib';
+import logger from '../../log';
+import { EmailClientService, SendEmailParams } from '../../types';
 
 export function resendService(): EmailClientService {
     async function send(params: SendEmailParams): Promise<void> {

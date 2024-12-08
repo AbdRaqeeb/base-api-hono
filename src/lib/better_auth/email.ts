@@ -1,6 +1,6 @@
+import { FROM_BASE, FROM_UPDATE, OTP_EXPIRY } from '../../constants';
 import { emailService } from '../../services';
 import { EmailClient, EmailTypes } from '../../types/enums';
-import { FROM_UPDATE, FROM_BASE, OTP_EXPIRY } from '../../constants';
 
 type SendVerificationOtp = {
     email: string;

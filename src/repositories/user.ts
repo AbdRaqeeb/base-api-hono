@@ -1,9 +1,9 @@
 import { Knex } from 'knex';
 
-import { User, UserCreate, UserFilter, UserRepository, UserUpdate } from '../types';
 import { USERS } from '../database';
 import * as lib from '../lib';
 import { generateId } from '../lib';
+import { User, UserCreate, UserFilter, UserRepository, UserUpdate } from '../types';
 
 interface UserStore {
     DB: Knex;

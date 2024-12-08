@@ -1,6 +1,6 @@
 import { Context } from 'hono';
-import { HttpStatusCode } from '../types/enums';
 import logger from '../log';
+import { HttpStatusCode } from '../types/enums';
 
 export const errorResponse = (
     context: Context,

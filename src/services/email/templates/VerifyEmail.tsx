@@ -1,4 +1,4 @@
-import { Body, Container, Head, Heading, Html, Preview, Section, Text, Hr } from '@react-email/components';
+import { Body, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components';
 import { VerifyEmailProps } from '../../../types';
 
 export const VerifyEmail = ({ otp = '123456', otpExpiry = '10 minutes' }: VerifyEmailProps) => {

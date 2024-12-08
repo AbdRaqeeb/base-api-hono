@@ -1,11 +1,11 @@
-import { sendgridService } from './sendgrid';
+import logger from '../../log';
 import { EmailAdapter, EmailService, EmailServiceStore, EmailTypeParams, SendEmailParams } from '../../types';
 import { EmailClient, EmailTypes } from '../../types/enums';
 import { brevoService } from './brevo';
-import logger from '../../log';
-import { getEmailHtml } from './templates';
-import { resendService } from './resend';
 import { nodemailerService } from './nodemailer';
+import { resendService } from './resend';
+import { sendgridService } from './sendgrid';
+import { getEmailHtml } from './templates';
 
 export function newEmailService(es: EmailServiceStore): EmailService {
     async function send<T extends EmailTypes>(

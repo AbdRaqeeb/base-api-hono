@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
+import { DEFAULT_SIZE } from '../../../src/constants';
+import { newUserService } from '../../../src/services';
 import { UserService } from '../../../src/types';
 import { repository, testDataService } from '../../utils';
-import { newUserService } from '../../../src/services';
-import { DEFAULT_SIZE } from '../../../src/constants';
 
 describe('User Service', () => {
     let userService: UserService;

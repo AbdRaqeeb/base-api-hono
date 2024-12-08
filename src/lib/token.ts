@@ -1,4 +1,4 @@
-import { JwtPayload, sign, verify as jwtVerify } from 'jsonwebtoken';
+import { JwtPayload, verify as jwtVerify, sign } from 'jsonwebtoken';
 import Config from '../config';
 
 interface TokenService {

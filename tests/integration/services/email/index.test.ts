@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
-import { EmailService, EmailServiceStore, SendEmailParams } from '../../../../src/types';
-import { newEmailService, newEmailServiceStore } from '../../../../src/services';
-import { EmailClient, EmailTypes } from '../../../../src/types/enums';
 import { request } from '../../../../src/lib';
+import { newEmailService, newEmailServiceStore } from '../../../../src/services';
+import { EmailService, EmailServiceStore, SendEmailParams } from '../../../../src/types';
+import { EmailClient, EmailTypes } from '../../../../src/types/enums';
 
 describe('Email Service', () => {
     let emailService: EmailService;

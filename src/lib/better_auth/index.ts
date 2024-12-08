@@ -1,12 +1,12 @@
-import { Pool } from 'pg';
 import { betterAuth } from 'better-auth';
 import { bearer, emailOTP, jwt, openAPI, username } from 'better-auth/plugins';
+import { Pool } from 'pg';
 
 import Config from '../../config';
-import project from '../../project';
-import { schema } from './schema';
 import { OTP_EXPIRY } from '../../constants';
+import project from '../../project';
 import { betterAuthEmails } from './email';
+import { schema } from './schema';
 
 export const auth = betterAuth({
     appName: project.name,

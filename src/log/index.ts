@@ -1,8 +1,8 @@
-import pino from 'pino';
 import { Context, Next } from 'hono';
-import { NODE_ENV } from '../types/enums';
+import pino from 'pino';
 import Config from '../config';
 import project from '../project';
+import { NODE_ENV } from '../types/enums';
 
 let targets: pino.TransportTargetOptions[] = [];
 

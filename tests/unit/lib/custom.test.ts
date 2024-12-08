@@ -1,12 +1,12 @@
-import Joi from 'joi';
-import { faker } from '@faker-js/faker';
 import { describe, expect, it, spyOn } from 'bun:test';
+import { faker } from '@faker-js/faker';
+import Joi from 'joi';
 import { DateTime } from 'luxon';
 
-import * as lib from '../../../src/lib';
 import { DEFAULT_SIZE, PASSWORD_REGEX } from '../../../src/constants';
-import { DB as db } from '../../utils';
+import * as lib from '../../../src/lib';
 import { RangeFilter } from '../../../src/types';
+import { DB as db } from '../../utils';
 
 describe('Custom Libraries', () => {
     describe('String', () => {

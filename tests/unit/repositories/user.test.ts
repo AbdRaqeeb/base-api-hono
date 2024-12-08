@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
-import { UserRepository } from '../../../src/types';
 import { newUserRepository } from '../../../src/repositories';
+import { UserRepository } from '../../../src/types';
 import { DB, testDataService } from '../../utils';
 
 describe('User Repository', () => {
