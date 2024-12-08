@@ -9,30 +9,27 @@ export const errorResponse = (
     err?: Error,
     data?: any
 ) => {
-    const response = { message, data };
-    logger.info(context.get('requestId'), statusCode, { message });
-    context.status(statusCode);
+    if (err) logger.error(err);
+    logger.info({ message, statusCode }, context.get('requestId'));
 
-    return context.json(response);
+    context.status(statusCode);
+    return context.json({ message, data });
 };
 
 export const serverErrorResponse = (context: Context, source: string, err: Error) => {
+    const statusCode = HttpStatusCode.InternalServerError;
+    const message = 'Internal Server Error';
+
     logger.error(err, `[${source}] Internal Server Error`);
-
-    const response = { message: 'Internal Server Error' };
-
-    logger.info(context.get('requestId'), HttpStatusCode.InternalServerError, response);
+    logger.info({ message, statusCode }, context.get('requestId'));
 
     context.status(HttpStatusCode.InternalServerError);
-
-    return context.json(response);
+    return context.json({ message: 'Internal Server Error' });
 };
 
 export const successResponse = (context: Context, statusCode: HttpStatusCode, message: string, data?: any) => {
-    const response = { message, data };
+    logger.info({ message, statusCode }, context.get('requestId'));
 
-    logger.info(context.get('requestId'), statusCode, { message });
     context.status(statusCode);
-
-    return context.json(response);
+    return context.json({ message, data });
 };

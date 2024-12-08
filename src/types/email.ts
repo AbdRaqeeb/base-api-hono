@@ -18,7 +18,7 @@ export interface SendEmailParams {
     send_at?: number;
     delivery_time?: string;
     tags?: string[];
-    html: string;
+    html?: string;
 }
 
 export interface EmailService {
@@ -35,13 +35,11 @@ export interface EmailClientService {
 }
 
 export interface ForgotPasswordEmailProps {
-    userName: string;
     otp: string;
     otpExpiry: string;
 }
 
 export interface VerifyEmailProps {
-    userName: string;
     otp: string;
     otpExpiry: string;
 }
@@ -52,8 +50,14 @@ export interface WelcomeEmailProps {
     appName: string;
 }
 
+export interface SignInOtpEmailProps {
+    otp: string;
+    otpExpiry: string;
+}
+
 export interface EmailTypeParams {
     [EmailTypes.WelcomeEmail]: WelcomeEmailProps;
     [EmailTypes.VerifyEmail]: VerifyEmailProps;
     [EmailTypes.ForgotPassword]: ForgotPasswordEmailProps;
+    [EmailTypes.SignInOtp]: SignInOtpEmailProps;
 }

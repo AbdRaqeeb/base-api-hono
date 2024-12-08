@@ -19,14 +19,6 @@ export enum NODE_ENV {
     TEST = 'test',
 }
 
-export enum AgeRange {
-    CHILD = '0-12',
-    TEENAGER = '13-19',
-    YOUNG_ADULT = '20-35',
-    ADULT = '36-60',
-    SENIOR = '61+',
-}
-
 export enum EmailClient {
     Resend = 'resend',
     Sendgrid = 'sendgrid',
@@ -38,20 +30,5 @@ export enum EmailTypes {
     WelcomeEmail = 'welcome-email',
     VerifyEmail = 'verify-email',
     ForgotPassword = 'forgot-password',
-}
-
-export enum OtpType {
-    ResetPassword = 'reset-password',
-    VerifyEmail = 'verify-email',
-    ForgotPassword = 'forgot-password',
-}
-
-export enum UserModel {
-    User = 'user',
-    Admin = 'admin',
-}
-
-export enum Role {
-    Admin = 'admin',
-    SuperAdmin = 'super-admin',
+    SignInOtp = 'sign-in-otp',
 }

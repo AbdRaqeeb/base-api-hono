@@ -1,7 +1,7 @@
 import { Body, Container, Head, Heading, Html, Preview, Section, Text, Hr } from '@react-email/components';
 import { VerifyEmailProps } from '../../../types';
 
-export const VerifyEmail = ({ userName = 'John', otp = '123456', otpExpiry = '10 minutes' }: VerifyEmailProps) => {
+export const VerifyEmail = ({ otp = '123456', otpExpiry = '10 minutes' }: VerifyEmailProps) => {
     return (
         <Html>
             <Head />
@@ -10,7 +10,7 @@ export const VerifyEmail = ({ userName = 'John', otp = '123456', otpExpiry = '10
                 <Container style={container}>
                     <Heading style={h1}>Verify Your Email Address</Heading>
 
-                    <Text style={text}>Hi {userName},</Text>
+                    <Text style={text}>Hi,</Text>
                     <Text style={text}>
                         Thanks for signing up! Please use the verification code below to verify your email address:
                     </Text>

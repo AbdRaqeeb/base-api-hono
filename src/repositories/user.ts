@@ -3,6 +3,7 @@ import { Knex } from 'knex';
 import { User, UserCreate, UserFilter, UserRepository, UserUpdate } from '../types';
 import { USERS } from '../database';
 import * as lib from '../lib';
+import { generateId } from '../lib';
 
 interface UserStore {
     DB: Knex;
@@ -10,7 +11,8 @@ interface UserStore {
 
 export function newUserRepository(us: UserStore): UserRepository {
     async function create(data: UserCreate): Promise<User> {
-        const [result] = await us.DB(USERS).insert(data).returning(lib.extractFieldNames(fields));
+        const payload = { ...data, id: generateId() };
+        const [result] = await us.DB(USERS).insert(payload).returning(lib.extractFieldNames(fields));
         return result;
     }
 
@@ -42,17 +44,17 @@ function findUserBaseQuery(db: Knex, filter: UserFilter): Knex.QueryBuilder {
     let query = db(`${USERS} as u`);
 
     if (filter.id) query.where('u.id', filter.id);
-    if (filter.age_range) query.where('u.age_range', filter.age_range);
     if (filter.first_name) query.whereRaw(`LOWER(u.first_name) = ?`, [filter.first_name.toLowerCase()]);
     if (filter.last_name) query.whereRaw(`LOWER(u.last_name) = ?`, [filter.last_name.toLowerCase()]);
+    if (filter.full_name) query.whereRaw(`LOWER(u.full_name) = ?`, [filter.full_name.toLowerCase()]);
     if (filter.email) query.whereRaw(`LOWER(u.email) = ?`, [filter.email.toLowerCase()]);
-    if (filter.is_active) query.where('u.is_active', filter.is_active);
-    if (filter.is_email_verified) query.where('u.is_email_verified', filter.is_email_verified);
+    if (filter.email_verified) query.where('u.email_verified', filter.email_verified);
     if (filter.search)
         query.where(function () {
             this.orWhereRaw('LOWER(u.first_name) LIKE ?', [`%${filter.search.toLowerCase()}%`])
                 .orWhereRaw('LOWER(u.last_name) LIKE ?', [`%${filter.search.toLowerCase()}%`])
-                .orWhereRaw('LOWER(u.email) LIKE ?', [`%${filter.search.toLowerCase()}%`]);
+                .orWhereRaw('LOWER(u.email) LIKE ?', [`%${filter.search.toLowerCase()}%`])
+                .orWhereRaw('LOWER(u.full_name) LIKE ?', [`%${filter.search.toLowerCase()}%`]);
         });
 
     // add range query
@@ -73,12 +75,11 @@ const fields = [
     'u.id as id',
     'u.first_name as first_name',
     'u.last_name as last_name',
+    'u.full_name as full_name',
     'u.email as email',
-    'u.age_range as age_range',
-    'u.avatar_url as avatar_url',
-    'u.password as password',
-    'u.is_email_verified as is_email_verified',
-    'u.is_active as is_active',
+    'u.email_verified as email_verified',
+    'u.username as username',
+    'u.image as image',
     'u.created_at as created_at',
     'u.updated_at as updated_at',
 ];

@@ -2,15 +2,14 @@ import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { EmailClientService, SendEmailParams } from '../../../../src/types';
-import { sendgridService } from '../../../../src/services/email/sendgrid';
+import { nodemailerService, transporter } from '../../../../src/services/email/nodemailer';
 import logger from '../../../../src/log';
-import { request } from '../../../../src/lib';
 
-describe('Sendgrid Service', () => {
+describe('Nodemailer Service', () => {
     let emailClientService: EmailClientService;
 
     beforeAll(() => {
-        emailClientService = sendgridService();
+        emailClientService = nodemailerService();
     });
 
     describe('Send Email', () => {
@@ -18,15 +17,12 @@ describe('Sendgrid Service', () => {
             to: [faker.internet.email()],
             from: faker.internet.email(),
             subject: faker.word.words(),
-            html: faker.word.words(10),
+            html: faker.word.words(15),
             reply_to: faker.internet.email(),
-            send_at: Date.now(),
         };
 
         it('should send email', async () => {
-            const spy = spyOn(request, 'post').mockImplementation(() => {
-                return {} as any;
-            });
+            const spy = spyOn(transporter, 'sendMail').mockImplementation(() => ({}) as any);
 
             await emailClientService.send(params);
 
@@ -34,7 +30,7 @@ describe('Sendgrid Service', () => {
         });
 
         it('should log error', async () => {
-            spyOn(request, 'post').mockRejectedValue(() => Promise.reject('error'));
+            spyOn(transporter, 'sendMail').mockRejectedValue(() => Promise.reject('error'));
 
             const logSpy = spyOn(logger, 'error');
 

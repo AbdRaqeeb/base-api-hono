@@ -142,6 +142,11 @@ export const bodyParser = createMiddleware(async (context: Context, next: Next) 
     const isAllowedMethod = ['POST', 'PUT', 'PATCH'].includes(context.req.method);
     const isJSON = context.req.header('content-type')?.includes('application/json');
 
+    if (context.req.path.includes('/auth')) {
+        await next();
+        return;
+    }
+
     if (!isAllowedMethod || !isJSON) {
         context.set('body', {});
         await next();

@@ -1,22 +1,26 @@
-import { Resend } from 'resend';
 import { EmailClientService, SendEmailParams } from '../../types';
 import Config from '../../config';
 import logger from '../../log';
-
-const resend = new Resend(Config.resendApiKey);
+import { request } from '../../lib';
 
 export function resendService(): EmailClientService {
     async function send(params: SendEmailParams): Promise<void> {
         try {
             const to = (Array.isArray(params.to) ? params.to : [params.to]) as string | string[];
 
-            await resend.emails.send({
+            const payload = {
                 from: params.from as string,
                 to,
                 subject: params.subject,
                 html: params.html,
-                replyTo: params.reply_to as string,
-                scheduledAt: params.send_at.toString(),
+                replyTo: params?.reply_to as string,
+                scheduledAt: params?.send_at?.toString(),
+            };
+
+            await request.post('https://api.resend.com/emails', payload, {
+                headers: {
+                    Authorization: `Bearer ${Config.resendApiKey}`,
+                },
             });
         } catch (error) {
             logger.error(error, '[ResendService][Send] - error');
@@ -25,5 +29,3 @@ export function resendService(): EmailClientService {
 
     return { send };
 }
-
-export { resend };

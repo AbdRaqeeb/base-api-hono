@@ -36,8 +36,6 @@ export type CalculatedPaginationData = {
 export type UnknownObject = Record<string, any>;
 
 export type PasswordService = {
-    valid(passwordToCompare: string, userPassword: string): boolean;
-    hash(password: string): string;
     generatePassword(): string;
 };
 

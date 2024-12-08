@@ -1,16 +1,6 @@
-import bcrypt from 'bcryptjs';
-import { SALT_VALUE } from '../constants';
 import { PasswordService } from '../types';
 
 function newPasswordService(): PasswordService {
-    function valid(passwordToCompare: string, userPassword: string) {
-        return bcrypt.compareSync(passwordToCompare, userPassword);
-    }
-
-    function hash(password: string): string {
-        return bcrypt.hashSync(password, SALT_VALUE);
-    }
-
     function generatePassword() {
         const uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
@@ -46,7 +36,7 @@ function newPasswordService(): PasswordService {
         return password;
     }
 
-    return { hash, valid, generatePassword };
+    return { generatePassword };
 }
 
 export const passwordService = newPasswordService();

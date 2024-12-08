@@ -49,4 +49,4 @@ export function newEmailServiceStore(): EmailServiceStore {
     return { getEmailAdapter };
 }
 
-export * from '../../types/email';
+export const emailService = newEmailService(newEmailServiceStore());

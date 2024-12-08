@@ -6,7 +6,6 @@ import * as types from '../types';
 type Env = {
     Variables: {
         user: types.UserResponse;
-        admin: types.AdminResponse;
     };
 };
 
@@ -17,9 +16,7 @@ export interface Server {
     app: App;
     factory: Factory<Env>;
     userService: types.UserService;
-    otpService: types.OtpService;
     emailService: types.EmailService;
-    adminService: types.AdminService;
 }
 
 export { Server as HttpServer } from 'http';

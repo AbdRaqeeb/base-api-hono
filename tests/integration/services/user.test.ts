@@ -4,14 +4,13 @@ import { faker } from '@faker-js/faker';
 import { UserService } from '../../../src/types';
 import { repository, testDataService } from '../../utils';
 import { newUserService } from '../../../src/services';
-import { passwordService } from '../../../src/lib';
 import { DEFAULT_SIZE } from '../../../src/constants';
 
 describe('User Service', () => {
     let userService: UserService;
 
     beforeAll(() => {
-        userService = newUserService(repository.user, passwordService);
+        userService = newUserService(repository.user);
     });
 
     describe('Create User', () => {
@@ -23,13 +22,9 @@ describe('User Service', () => {
             expect(result).toMatchObject({
                 first_name: data.first_name,
                 last_name: data.last_name,
+                full_name: data.full_name,
                 email: data.email,
-                has_password: true,
-                age_range: data.age_range,
-                is_active: true,
-                is_email_verified: false,
             });
-            expect(result.password).toBeUndefined();
         });
     });
 
@@ -42,11 +37,8 @@ describe('User Service', () => {
             expect(result.data[0]).toMatchObject({
                 first_name: user.first_name,
                 last_name: user.last_name,
+                full_name: user.full_name,
                 email: user.email,
-                has_password: true,
-                age_range: user.age_range,
-                is_active: true,
-                is_email_verified: false,
             });
             expect(result.pagination).toMatchObject({
                 size: DEFAULT_SIZE,
@@ -56,7 +48,7 @@ describe('User Service', () => {
     });
 
     describe('Get User', () => {
-        it('should get user without password', async () => {
+        it('should get user', async () => {
             const { user } = await testDataService.createUser();
 
             const result = await userService.get({ id: user.id });
@@ -64,29 +56,8 @@ describe('User Service', () => {
             expect(result).toMatchObject({
                 first_name: user.first_name,
                 last_name: user.last_name,
+                full_name: user.full_name,
                 email: user.email,
-                has_password: true,
-                age_range: user.age_range,
-                is_active: true,
-                is_email_verified: false,
-            });
-            expect(result.password).toBeUndefined();
-        });
-
-        it('should get user with password', async () => {
-            const { user } = await testDataService.createUser();
-
-            const result = await userService.get({ id: user.id }, { includePassword: true });
-
-            expect(result).toMatchObject({
-                first_name: user.first_name,
-                last_name: user.last_name,
-                email: user.email,
-                has_password: true,
-                age_range: user.age_range,
-                is_active: true,
-                is_email_verified: false,
-                password: user.password,
             });
         });
     });
@@ -101,25 +72,9 @@ describe('User Service', () => {
             expect(result).toMatchObject({
                 first_name: newFirstName,
                 last_name: user.last_name,
+                full_name: user.full_name,
                 email: user.email,
-                has_password: true,
-                age_range: user.age_range,
-                is_active: true,
-                is_email_verified: false,
             });
-        });
-
-        it('should hash user password on update', async () => {
-            const newPassword = faker.word.noun({ length: 10 });
-            const { user } = await testDataService.createUser();
-
-            await userService.update({ id: user.id }, { password: newPassword });
-
-            const result = await userService.get({ id: user.id }, { includePassword: true });
-
-            expect(result.password).not.toBe(user.password);
-            expect(result.password).not.toBe(newPassword);
-            expect(passwordService.valid(newPassword, result.password)).toBeTruthy();
         });
     });
 

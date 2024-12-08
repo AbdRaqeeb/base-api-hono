@@ -1,44 +1,41 @@
 import { Knex } from 'knex';
-import { RangeFilter, PaginationParam, PaginationResponse } from './custom';
-import { AgeRange } from './enums';
+import { PaginationParam, PaginationResponse, RangeFilter } from './custom';
 
 export interface User {
-    id: number;
+    id: string;
     first_name?: string;
     last_name?: string;
-    age_range?: AgeRange;
+    full_name: string;
+    username: string;
     email: string;
-    avatar_url?: string;
-    password?: string;
-    is_email_verified: boolean;
-    is_active: boolean;
+    email_verified: boolean;
+    image?: string;
     created_at: Date;
-    updated_at: Date;
+    updatedAt?: Date;
 }
 
 export interface UserCreate {
+    id?: string;
     first_name?: string;
     last_name?: string;
-    age_range?: AgeRange;
+    full_name: string;
+    username: string;
     email: string;
-    password?: string;
-    avatar_url?: string;
-    is_email_verified?: boolean;
+    image?: string;
+    email_verified?: boolean;
 }
 
 export type UserUpdate = Partial<UserCreate> & {
-    is_email_verified?: boolean;
-    is_active?: boolean;
+    email_verified?: boolean;
 };
 
 export interface UserFilter extends RangeFilter, PaginationParam {
-    id?: number;
+    id?: string;
     first_name?: string;
     last_name?: string;
-    age_range?: AgeRange;
     email?: string;
-    is_email_verified?: boolean;
-    is_active?: boolean;
+    email_verified?: boolean;
+    full_name?: string;
 }
 
 export interface UserRepository {
@@ -50,30 +47,12 @@ export interface UserRepository {
     query(filter: UserFilter): Knex.QueryBuilder;
 }
 
-export type UserResponse = User & {
-    has_password: boolean;
-};
-
-export type UserServiceOptions = {
-    includePassword?: boolean;
-};
+export type UserResponse = User;
 
 export interface UserService {
     create(data: UserCreate): Promise<UserResponse>;
     list(data: UserFilter): Promise<PaginationResponse<UserResponse>>;
-    get(data: UserFilter, options?: UserServiceOptions): Promise<UserResponse>;
+    get(data: UserFilter): Promise<UserResponse>;
     update(filter: UserFilter, data: UserUpdate): Promise<UserResponse>;
     remove(filter: UserFilter): Promise<void>;
 }
-
-export type UserCreateSchema = UserCreate;
-
-export type UserUpdateSchema = Partial<Omit<UserCreate, 'email'>> & {
-    avatar_url?: string;
-    is_active?: boolean;
-};
-
-export type UserLoginSchema = {
-    email: string;
-    password: string;
-};

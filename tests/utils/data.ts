@@ -2,12 +2,10 @@ import { faker } from '@faker-js/faker';
 import * as jwt from 'jsonwebtoken';
 
 import * as types from '../../src/types';
-import * as enums from '../../src/types/enums';
-import { OtpType, Role, UserModel } from '../../src/types/enums';
 import { createRepositories } from '../../src/repositories';
 import { DB } from './postgres';
 import { PASSWORD_REGEX } from '../../src/constants';
-import { passwordService, tokenService } from '../../src/lib';
+import { generateRandomString, tokenService } from '../../src/lib';
 
 export const repository = createRepositories(DB);
 
@@ -21,30 +19,39 @@ function newTestData(rp: types.Repository) {
         payload?: Partial<types.UserCreate>,
         options?: DataOptions
     ): Promise<{ user: types.User; data: types.UserCreate; token: string }> {
+        const first_name = payload?.first_name || faker.person.firstName();
+        const last_name = payload?.last_name || faker.person.lastName();
+        const username =
+            payload?.username ||
+            faker.internet.userName({
+                firstName: first_name,
+                lastName: last_name,
+            });
+        const email =
+            payload?.email ||
+            faker.internet.email({
+                firstName: first_name,
+                lastName: last_name,
+                provider: generateRandomString(),
+                allowSpecialCharacters: true,
+            });
+
         const data: types.UserCreate = {
-            first_name: payload?.first_name || faker.person.firstName(),
-            last_name: payload?.last_name || faker.person.firstName(),
-            email: payload?.email || faker.internet.email(),
-            password: payload?.password || faker.internet.password(),
-            age_range: payload?.age_range || enums.AgeRange.ADULT,
-            avatar_url: payload?.avatar_url || faker.image.avatar(),
-            is_email_verified: payload?.is_email_verified || false,
+            first_name,
+            last_name,
+            username,
+            email,
+            full_name: payload?.full_name || faker.person.fullName(),
+            image: payload?.image || faker.image.avatar(),
+            email_verified: payload?.email_verified || false,
         };
-
-        // skip password
-        if (options?.omitPassword) {
-            delete data.password;
-        }
-
-        // hash password
-        if (data.password) data.password = passwordService.hash(data.password);
 
         if (options?.skipCreate) {
             return { data, user: data as types.User, token: '' };
         }
 
         const user = await rp.user.create(data);
-        const token = tokenService.issue({ id: user.id, role: UserModel.User });
+        const token = tokenService.issue({ id: user.id });
 
         return { user, data, token };
     }
@@ -99,56 +106,11 @@ function newTestData(rp: types.Repository) {
         return jwt.sign({ id: 12345 }, 'test', { expiresIn: '5s' });
     }
 
-    async function createOtp(payload?: Partial<types.OtpCreate>): Promise<{ data: types.OtpCreate; otp: types.Otp }> {
-        const data: types.OtpCreate = {
-            model: payload?.model || UserModel.Admin,
-            model_id: payload?.model_id || faker.number.int({ min: 1, max: 100 }),
-            type: payload?.type || OtpType.ResetPassword,
-        };
-
-        const otp = await rp.otp.create(data);
-
-        return { data, otp };
-    }
-
-    async function createAdmin(
-        payload?: Partial<types.AdminCreate>,
-        options?: DataOptions
-    ): Promise<{ admin: types.Admin; data: types.AdminCreate; token: string }> {
-        const data: types.AdminCreate = {
-            first_name: payload?.first_name || faker.person.firstName(),
-            last_name: payload?.last_name || faker.person.firstName(),
-            email: payload?.email || faker.internet.email(),
-            password: payload?.password || faker.internet.password(),
-            username: payload?.username || faker.internet.userName(),
-            role: payload?.role || Role.Admin,
-        };
-
-        // skip password
-        if (options?.omitPassword) {
-            delete data.password;
-        }
-
-        // hash password
-        if (data.password) data.password = passwordService.hash(data.password);
-
-        if (options?.skipCreate) {
-            return { data, admin: data as types.Admin, token: '' };
-        }
-
-        const admin = await rp.admin.create(data);
-        const token = tokenService.issue({ id: admin.id, role: UserModel.Admin });
-
-        return { admin, data, token };
-    }
-
     return {
         createUser,
         generatePassword,
         issueBadToken,
         issueExpiredToken,
-        createOtp,
-        createAdmin,
     };
 }
 

@@ -2,7 +2,6 @@ import { Body, Container, Head, Heading, Html, Preview, Section, Text, Hr } from
 import { ForgotPasswordEmailProps } from '../../../types';
 
 export const ForgotPasswordEmail = ({
-    userName = 'John',
     otp = '123456',
     otpExpiry = '10 minutes',
 }: ForgotPasswordEmailProps) => {
@@ -14,7 +13,7 @@ export const ForgotPasswordEmail = ({
                 <Container style={container}>
                     <Heading style={h1}>Forgot Your Password?</Heading>
 
-                    <Text style={text}>Hi {userName},</Text>
+                    <Text style={text}>Hi,</Text>
                     <Text style={text}>
                         We received a request to reset your password. Use the OTP below to complete the process:
                     </Text>

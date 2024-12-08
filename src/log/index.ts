@@ -12,7 +12,6 @@ if (Config.nodeEnv === NODE_ENV.DEVELOPMENT) {
         options: {
             colorize: true,
             translateTime: 'UTC:yyyy-mm-dd HH:MM:ss',
-            messageKey: 'message',
         },
     });
 }

@@ -19,7 +19,15 @@ export interface Config {
             user: string;
             pass: string;
         };
-    }
+    };
+    google: {
+        client_id: string;
+        client_secret: string;
+    };
+    github: {
+        client_id: string;
+        client_secret: string;
+    };
 }
 
 export const getConfig = (): Config => {
@@ -44,13 +52,21 @@ export const getConfig = (): Config => {
         brevoApiKey: process.env.BREVO_API_KEY || 'xxxxxxxxxxxxxxxxxx',
         resendApiKey: process.env.RESEND_API_KEY || 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         smtp: {
-            host: process.env.SMTP_HOST ||'smtp.example.com',
+            host: process.env.SMTP_HOST || 'smtp.example.com',
             port: Number(process.env.SMTP_PORT) || 587,
             secure: process.env.SMTP_SECURE === '1',
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASSWORD,
             },
-        }
+        },
+        google: {
+            client_id: process.env.GOOGLE_CLIENT_ID || 'xxxxxxxxxxxxxxxxxxx',
+            client_secret: process.env.GOOGLE_CLIENT_SECRET || 'xxxxxxxxxxxxxxxxxxx',
+        },
+        github: {
+            client_id: process.env.GITHUB_CLIENT_ID || 'xxxxxxxxxxxxxxxxxxx',
+            client_secret: process.env.GITHUB_CLIENT_SECRET || 'xxxxxxxxxxxxxxxxxxx',
+        },
     };
 };

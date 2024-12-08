@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
-import { brevoService, brevoInstance as brevo, getTemplateId } from '../../../../src/services/email/brevo';
-import { EmailClientService, SendEmailTemplateParams, SendEmailTextParams } from '../../../../src/types';
-import { EmailTypes } from '../../../../src/types/enums';
+import { brevoService } from '../../../../src/services/email/brevo';
+import { EmailClientService, SendEmailParams } from '../../../../src/types';
 import logger from '../../../../src/log';
+import { request } from '../../../../src/lib';
 
 describe('Brevo Service', () => {
     let emailService: EmailClientService;
@@ -12,36 +12,36 @@ describe('Brevo Service', () => {
     beforeAll(() => {
         emailService = brevoService();
 
-        spyOn(brevo, 'sendTransacEmail').mockImplementation(async () => {
+        spyOn(request, 'post').mockImplementation(async () => {
             return {} as any;
         });
     });
 
-    describe('Send Email Text', () => {
-        const data: SendEmailTextParams = {
+    describe('Send Email', () => {
+        const data: SendEmailParams = {
             from: { email: faker.internet.email(), name: faker.person.fullName() },
             to: [{ email: faker.internet.email(), name: faker.person.fullName() }],
             subject: faker.word.words(3),
-            body: faker.word.words(5),
+            html: faker.word.words(5),
             reply_to: { email: faker.internet.email(), name: faker.person.fullName() },
         };
 
-        it('should send email text', async () => {
-            const spy = spyOn(brevo, 'sendTransacEmail');
+        it('should send email', async () => {
+            const spy = spyOn(request, 'post');
 
-            await emailService.sendEmailText(data);
+            await emailService.send(data);
 
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should send email text with to, reply_to and from as string', async () => {
-            const spy = spyOn(brevo, 'sendTransacEmail');
+        it('should send email with to, reply_to and from as string', async () => {
+            const spy = spyOn(request, 'post');
 
-            await emailService.sendEmailText({
+            await emailService.send({
                 from: faker.internet.email(),
                 to: faker.internet.email(),
                 subject: faker.word.words(3),
-                body: faker.word.words(5),
+                html: faker.word.words(5),
                 reply_to: faker.internet.email(),
             });
 
@@ -49,13 +49,13 @@ describe('Brevo Service', () => {
         });
 
         it('should send email text with to as array of string', async () => {
-            const spy = spyOn(brevo, 'sendTransacEmail');
+            const spy = spyOn(request, 'post');
 
-            await emailService.sendEmailText({
+            await emailService.send({
                 from: faker.internet.email(),
                 to: [faker.internet.email(), faker.internet.email()],
                 subject: faker.word.words(3),
-                body: faker.word.words(5),
+                html: faker.word.words(5),
                 reply_to: faker.internet.email(),
             });
 
@@ -63,54 +63,13 @@ describe('Brevo Service', () => {
         });
 
         it('should catch error', async () => {
-            spyOn(brevo, 'sendTransacEmail').mockRejectedValue(() => Promise.reject('error'));
+            spyOn(request, 'post').mockRejectedValue(() => Promise.reject('error'));
 
             const spy = spyOn(logger, 'error');
 
-            await emailService.sendEmailText(data);
+            await emailService.send(data);
 
             expect(spy).toHaveBeenCalled();
-        });
-    });
-
-    describe('Send Email Template', () => {
-        const data: SendEmailTemplateParams = {
-            from: { email: faker.internet.email(), name: faker.person.fullName() },
-            to: [{ email: faker.internet.email(), name: faker.person.fullName() }],
-            subject: faker.word.words(3),
-            templateData: { otp: 123 },
-            emailType: EmailTypes.VerifyEmail,
-            reply_to: { email: faker.internet.email(), name: faker.person.fullName() },
-        };
-
-        it('should send email template', async () => {
-            const spy = spyOn(brevo, 'sendTransacEmail');
-
-            await emailService.sendEmailTemplate(data);
-
-            expect(spy).toHaveBeenCalled();
-        });
-
-        it('should catch error', async () => {
-            spyOn(brevo, 'sendTransacEmail').mockRejectedValue(() => Promise.reject('error'));
-
-            const spy = spyOn(logger, 'error');
-
-            await emailService.sendEmailTemplate(data);
-
-            expect(spy).toHaveBeenCalled();
-        });
-    });
-
-    describe('Get Template ID', () => {
-        it('should get the reset password template id', () => {
-            const result = getTemplateId(EmailTypes.ResetPassword);
-
-            expect(result).toBeDefined();
-        });
-
-        it('should throw error for unsupported template id', () => {
-            expect(() => getTemplateId('test' as EmailTypes)).toThrow('Unknown Email Type');
         });
     });
 });

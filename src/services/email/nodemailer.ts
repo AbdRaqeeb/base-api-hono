@@ -23,8 +23,8 @@ export function nodemailerService(): EmailClientService {
                 to,
                 subject: params.subject,
                 html: params.html,
-                replyTo: params.reply_to as string,
-                date: params.send_at.toString(),
+                replyTo: params?.reply_to as string,
+                date: params?.send_at?.toString(),
             };
 
             await transporter.sendMail(options);

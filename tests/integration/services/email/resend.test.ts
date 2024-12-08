@@ -2,15 +2,15 @@ import { beforeAll, describe, expect, it, spyOn } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
 import { EmailClientService, SendEmailParams } from '../../../../src/types';
-import { sendgridService } from '../../../../src/services/email/sendgrid';
+import { resendService } from '../../../../src/services/email/resend';
 import logger from '../../../../src/log';
 import { request } from '../../../../src/lib';
 
-describe('Sendgrid Service', () => {
+describe('Resend Service', () => {
     let emailClientService: EmailClientService;
 
     beforeAll(() => {
-        emailClientService = sendgridService();
+        emailClientService = resendService();
     });
 
     describe('Send Email', () => {
@@ -18,15 +18,13 @@ describe('Sendgrid Service', () => {
             to: [faker.internet.email()],
             from: faker.internet.email(),
             subject: faker.word.words(),
-            html: faker.word.words(10),
+            html: faker.word.words(15),
             reply_to: faker.internet.email(),
             send_at: Date.now(),
         };
 
         it('should send email', async () => {
-            const spy = spyOn(request, 'post').mockImplementation(() => {
-                return {} as any;
-            });
+            const spy = spyOn(request, 'post').mockImplementation(() => ({}) as any);
 
             await emailClientService.send(params);
 

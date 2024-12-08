@@ -1,10 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
+import { beforeAll, describe, expect, it } from 'bun:test';
 import { faker } from '@faker-js/faker';
 
-import { UserCreate, UserRepository } from '../../../src/types';
+import { UserRepository } from '../../../src/types';
 import { newUserRepository } from '../../../src/repositories';
 import { DB, testDataService } from '../../utils';
-import { AgeRange } from '../../../src/types/enums';
 
 describe('User Repository', () => {
     let userRepository: UserRepository;
@@ -15,25 +14,16 @@ describe('User Repository', () => {
 
     describe('Create User', () => {
         it('should create user', async () => {
-            const data: UserCreate = {
-                first_name: faker.person.firstName(),
-                last_name: faker.person.firstName(),
-                email: faker.internet.email(),
-                password: faker.internet.password(),
-                age_range: AgeRange.ADULT,
-                avatar_url: faker.image.avatar(),
-            };
+            const { data } = await testDataService.createUser({}, { skipCreate: true });
 
             const result = await userRepository.create(data);
 
             expect(result).toMatchObject({
                 first_name: data.first_name,
                 last_name: data.last_name,
+                full_name: data.full_name,
                 email: data.email,
-                password: data.password,
-                age_range: data.age_range,
-                is_active: true,
-                is_email_verified: false,
+                email_verified: false,
             });
         });
     });
@@ -47,14 +37,11 @@ describe('User Repository', () => {
             expect(result).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
-                        id: expect.any(Number),
                         first_name: user.first_name,
                         last_name: user.last_name,
+                        full_name: user.full_name,
                         email: user.email,
-                        password: user.password,
-                        age_range: user.age_range,
-                        is_active: true,
-                        is_email_verified: false,
+                        email_verified: false,
                     }),
                 ])
             );
@@ -68,14 +55,11 @@ describe('User Repository', () => {
             expect(result).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
-                        id: expect.any(Number),
                         first_name: user.first_name,
                         last_name: user.last_name,
+                        full_name: user.full_name,
                         email: user.email,
-                        password: user.password,
-                        age_range: user.age_range,
-                        is_active: true,
-                        is_email_verified: false,
+                        email_verified: false,
                     }),
                 ])
             );
@@ -84,37 +68,19 @@ describe('User Repository', () => {
 
     describe('Get User', () => {
         it('should get user', async () => {
-            const age_range = AgeRange.CHILD;
             const first_name = faker.person.firstName();
             const last_name = faker.person.lastName();
             const email = faker.internet.email();
 
-            const { user } = await testDataService.createUser({
-                age_range,
-                first_name,
-                last_name,
-                email,
-            });
+            const { user } = await testDataService.createUser({ first_name, last_name, email });
 
-            const result = await userRepository.get({
-                id: user.id,
-                is_email_verified: false,
-                is_active: true,
-                age_range,
-                first_name,
-                last_name,
-                email,
-            });
+            const result = await userRepository.get({ id: user.id });
 
             expect(result).toMatchObject({
-                id: expect.any(Number),
-                first_name: user.first_name,
-                last_name: user.last_name,
-                email: user.email,
-                password: user.password,
-                age_range: user.age_range,
-                is_active: true,
-                is_email_verified: false,
+                first_name,
+                last_name,
+                full_name: user.full_name,
+                email,
             });
         });
     });
@@ -123,17 +89,14 @@ describe('User Repository', () => {
         it('should update user', async () => {
             const { user } = await testDataService.createUser();
 
-            const result = await userRepository.update({ id: user.id }, { is_email_verified: true });
+            const result = await userRepository.update({ id: user.id }, { email_verified: true });
 
             expect(result).toMatchObject({
-                id: expect.any(Number),
                 first_name: user.first_name,
                 last_name: user.last_name,
+                full_name: user.full_name,
                 email: user.email,
-                password: user.password,
-                age_range: user.age_range,
-                is_active: true,
-                is_email_verified: true,
+                email_verified: true,
             });
         });
     });
@@ -150,6 +113,4 @@ describe('User Repository', () => {
             expect(result).toBeUndefined();
         });
     });
-
-    afterAll(async () => {});
 });

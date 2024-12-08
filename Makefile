@@ -31,4 +31,10 @@ seed-run:
 seed-run-test:
 	bun --bun --env-file .env.test knex seed:run --knexfile ./knex/knexfile.ts --env test
 
+ba-migrate-add:
+	bunx @better-auth/cli@latest generate --config src/lib/better_auth/index.ts --output knex/ba_migrations/$$(date +"%Y%m%d_%H%M%S")_auth_migration.sql --y
+
+ba-migrate-run:
+	bunx @better-auth/cli@latest migrate --config src/lib/better_auth/index.ts
+
 .PHONY: dev build test

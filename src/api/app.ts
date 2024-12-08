@@ -46,15 +46,12 @@ export const createNewServer = (): Server => {
     const server: Server = {
         app,
         factory,
-        userService: services.newUserService(repo.user, lib.passwordService),
-        otpService: services.newOtpService(repo.otp),
-        emailService: services.newEmailService(services.newEmailServiceStore()),
-        adminService: services.newAdminService(repo.admin, lib.passwordService),
+        userService: services.newUserService(repo.user),
+        emailService: services.emailService,
     };
 
     // mount routes
-    httpServices.userHttpService(server).registerUserRoutes(router);
-    httpServices.adminHttpService(server).registerAdminRoutes(router);
+    httpServices.authHttpService().registerAuthRoutes(router);
 
     app.route('/api', router);
 

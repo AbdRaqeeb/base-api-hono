@@ -1,2 +1,2 @@
-export const ACCOUNT_SCHEMA = 'accounts';
+export const SETTINGS = 'settings';
 export const PUBLIC_SCHEMA = 'public';
