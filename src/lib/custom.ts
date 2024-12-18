@@ -166,6 +166,12 @@ export const bodyParser = createMiddleware(async (context: Context, next: Next) 
     await next();
 });
 
+export const setHeaders = createMiddleware(async (context: Context, next: Next) => {
+    context.header('Access-Control-Allow-Methods', 'GET,PUT,PATCH,POST,DELETE,OPTIONS');
+    context.header('Access-Control-Allow-Headers', 'Accept, Content-Length, Content-Type, Authorization');
+    await next();
+});
+
 export function extractFieldNames(fields: string[]): string[] {
     return fields.map((field) => {
         const parts = field.split(' as ');

@@ -4,7 +4,7 @@ import { requestId } from 'hono/request-id';
 
 import * as httpServices from '../api';
 import { connection, createPgAdapter } from '../database';
-import * as lib from '../lib';
+import { bodyParser, setHeaders } from '../lib';
 import { logRequestMiddleware } from '../log';
 import project from '../project';
 import { createRepositories } from '../repositories';
@@ -19,13 +19,32 @@ const startNewApplication = () => {
     const router = new Hono<Env>();
 
     // set headers
-    app.use(cors());
+    app.use(
+        cors({
+            origin: '*',
+            allowHeaders: ['Accept', 'Content-Length', 'Content-Type', 'Authorization'],
+            allowMethods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+            maxAge: 3600,
+        })
+    );
+    router.use(
+        cors({
+            origin: '*',
+            allowHeaders: ['Accept', 'Content-Length', 'Content-Type', 'Authorization'],
+            allowMethods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+            maxAge: 3600,
+        })
+    );
+
+    // set headers
+    app.use(setHeaders);
+    router.use(setHeaders);
 
     // set request id
     app.use('*', requestId());
 
     // parse json
-    app.use(lib.bodyParser);
+    app.use(bodyParser);
 
     // log request
     app.use(logRequestMiddleware());
