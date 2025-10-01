@@ -28,7 +28,16 @@ export enum EmailClient {
 
 export enum EmailTypes {
     WelcomeEmail = 'welcome-email',
-    VerifyEmail = 'verify-email',
-    ForgotPassword = 'forgot-password',
+    VerifyEmailOtp = 'verify-email-otp',
+    ForgotPasswordOtp = 'forgot-password-otp',
     SignInOtp = 'sign-in-otp',
+    VerifyEmail = 'verify-email',
+    MagicLink = 'magic-link',
+    ForgotPassword = 'forgot-password',
+    TwoFactorAuthOtp = 'two-factor-auth-otp',
+}
+
+export enum UserRole {
+    Admin = 'admin',
+    User = 'user',
 }

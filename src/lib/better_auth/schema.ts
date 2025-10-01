@@ -1,4 +1,4 @@
-export const schema: Record<string, any> = {
+export const schema = {
     user: {
         modelName: 'users',
         fields: {
@@ -7,6 +7,7 @@ export const schema: Record<string, any> = {
             createdAt: 'created_at',
             updatedAt: 'updated_at',
             twoFactorEnabled: 'two_factor_enabled',
+            displayUsername: 'display_username',
         },
         additionalFields: {
             first_name: {
@@ -16,6 +17,11 @@ export const schema: Record<string, any> = {
             last_name: {
                 type: 'string',
                 required: false,
+            },
+            role: {
+                type: 'string',
+                required: true,
+                input: true,
             },
         },
     },
@@ -62,10 +68,26 @@ export const schema: Record<string, any> = {
         },
     },
     twoFactor: {
-        modelName: 'two_factors',
-        fields: {
-            backupCodes: 'backup_codes',
-            userId: 'user_id',
+        user: {
+            modelName: 'two_factors',
+            fields: {
+                twoFactorEnabled: 'two_factor_enabled',
+                backupCodes: 'backup_codes',
+                userId: 'user_id',
+            },
+        },
+        core: {
+            modelName: 'two_factors',
+            fields: {
+                backupCodes: 'backup_codes',
+                userId: 'user_id',
+                twoFactorEnabled: 'two_factor_enabled',
+            },
         },
     },
-};
+    username: { fields: { displayUsername: 'display_username' } },
+    admin: {
+        user: { fields: { banExpires: 'ban_expires', banReason: 'ban_reason' } },
+        session: { fields: { impersonatedBy: 'impersonated_by' } },
+    },
+} as const;

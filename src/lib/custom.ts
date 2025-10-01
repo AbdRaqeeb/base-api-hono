@@ -3,6 +3,8 @@ import { ObjectSchema } from 'joi';
 import { Knex } from 'knex';
 import { DateTime } from 'luxon';
 import { customAlphabet } from 'nanoid';
+import { rateLimiter, Store } from 'hono-rate-limiter';
+import RedisStore from 'rate-limit-redis';
 
 import { DEFAULT_SIZE } from '../constants';
 import logger from '../log';
@@ -15,6 +17,9 @@ import {
     RangeFilter,
     UnknownObject,
 } from '../types';
+import Config from '../config';
+import project from '../project';
+import { redis } from '../database';
 
 export function generateId(len = 15) {
     return customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', len)();
@@ -178,3 +183,15 @@ export function extractFieldNames(fields: string[]): string[] {
         return parts[0].split('.').pop() || '';
     });
 }
+
+export const apiRateLimiter = rateLimiter({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+    standardHeaders: 'draft-6', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+    keyGenerator: (c) => c.req.header('cf-connecting-ip') ?? generateId(), // Method to generate custom identifiers for clients.
+    store: new RedisStore({
+        // @ts-expect-error - Known issue: the `call` function is not present in @types/ioredis
+        sendCommand: (...args: string[]) => redis.call(...args),
+        prefix: `${Config.appStage}:${project.redisPrefix}:rate-limiter:`,
+    }) as unknown as Store,
+});

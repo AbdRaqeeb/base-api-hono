@@ -41,3 +41,5 @@ export function createPgAdapter(connection: DatabaseAdapterOptions): Knex {
 
     return knex(config);
 }
+
+export const database = createPgAdapter(connection);

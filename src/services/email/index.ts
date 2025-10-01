@@ -1,5 +1,5 @@
 import logger from '../../log';
-import { EmailAdapter, EmailService, EmailServiceStore, EmailTypeParams, SendEmailParams } from '../../types';
+import { EmailAdapter, EmailService, EmailServiceSendPayload, EmailServiceStore } from '../../types';
 import { EmailClient, EmailTypes } from '../../types/enums';
 import { brevoService } from './brevo';
 import { nodemailerService } from './nodemailer';
@@ -8,16 +8,11 @@ import { sendgridService } from './sendgrid';
 import { getEmailHtml } from './templates';
 
 export function newEmailService(es: EmailServiceStore): EmailService {
-    async function send<T extends EmailTypes>(
-        emailType: T,
-        emailTypeParams: EmailTypeParams[T],
-        params: SendEmailParams,
-        client?: EmailClient
-    ): Promise<void> {
+    async function send<T extends EmailTypes>(payload: EmailServiceSendPayload<T>): Promise<void> {
+        const { emailType, emailTypeParams, params, client } = payload;
         const { emailService } = es.getEmailAdapter(client);
 
         try {
-            // send email
             params.html = await getEmailHtml(emailType, emailTypeParams);
             await emailService.send(params);
         } catch (error) {

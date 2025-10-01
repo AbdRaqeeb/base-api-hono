@@ -1,91 +1,60 @@
-import { Body, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components';
+import {
+    Body,
+    Button,
+    Container,
+    Head,
+    Heading,
+    Hr,
+    Html,
+    Img,
+    Link,
+    Preview,
+    Section,
+    Text,
+} from '@react-email/components';
+import { APP_LOGO, APP_NAME, COMPANY_ADDRESS } from '../../../constants';
 import { VerifyEmailProps } from '../../../types';
+import { styles } from './styles';
 
-export const VerifyEmail = ({ otp = '123456', otpExpiry = '10 minutes' }: VerifyEmailProps) => {
+export default function EmailVerification({ url }: VerifyEmailProps) {
     return (
         <Html>
             <Head />
             <Preview>Verify your email address</Preview>
-            <Body style={main}>
-                <Container style={container}>
-                    <Heading style={h1}>Verify Your Email Address</Heading>
+            <Body style={styles.main}>
+                <Container style={styles.container}>
+                    <Img src={APP_LOGO} alt='Company Logo' style={styles.logo} />
 
-                    <Text style={text}>Hi,</Text>
-                    <Text style={text}>
-                        Thanks for signing up! Please use the verification code below to verify your email address:
-                    </Text>
-
-                    <Section style={otpContainer}>
-                        <Text style={otpText}>{otp}</Text>
+                    <Section style={{ padding: '20px 0' }}>
+                        <Heading style={{ fontSize: '24px', fontWeight: 'normal', textAlign: 'center' as const }}>
+                            Welcome!
+                        </Heading>
+                        <Text style={styles.paragraph}>
+                            Thanks for signing up! To get started, please verify your email address by clicking the
+                            button below.
+                        </Text>
+                        <Button href={url} style={styles.button}>
+                            Verify Email
+                        </Button>
+                        <Text style={styles.paragraph}>
+                            If you didn't create an account, you can safely ignore this email.
+                        </Text>
+                        <Text style={styles.paragraph}>
+                            If the button above doesn't work, copy and paste this link into your browser:
+                        </Text>
+                        <Link href={url} style={{ color: '#2652bf', display: 'block', marginTop: '8px' }}>
+                            {url}
+                        </Link>
                     </Section>
 
-                    <Text style={text}>This verification code will expire in {otpExpiry}.</Text>
+                    <Hr style={styles.hr} />
 
-                    <Text style={text}>If you did not create an account, you can safely ignore this email.</Text>
-
-                    <Hr style={hr} />
-
-                    <Text style={footer}>For security reasons, never share this verification code with anyone.</Text>
-                    <Text style={footer}>Need help? Contact our support team.</Text>
+                    <Text style={styles.footer}>
+                        This email was sent from {APP_NAME}. If you have any questions, please contact our support team.
+                    </Text>
+                    <Text style={styles.footer}>{COMPANY_ADDRESS}</Text>
                 </Container>
             </Body>
         </Html>
     );
-};
-
-export default VerifyEmail;
-
-const main = {
-    backgroundColor: '#ffffff',
-    fontFamily:
-        '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
-};
-
-const container = {
-    margin: '0 auto',
-    padding: '20px 0 48px',
-    width: '580px',
-};
-
-const h1 = {
-    color: '#1a1a1a',
-    fontSize: '24px',
-    fontWeight: '600',
-    lineHeight: '40px',
-    margin: '0 0 20px',
-};
-
-const text = {
-    color: '#444',
-    fontSize: '16px',
-    lineHeight: '24px',
-    margin: '0 0 10px',
-};
-
-const otpContainer = {
-    background: '#f9fafb',
-    borderRadius: '6px',
-    margin: '24px 0',
-    padding: '24px',
-    textAlign: 'center' as const,
-};
-
-const otpText = {
-    color: '#1a1a1a',
-    fontSize: '32px',
-    fontWeight: '700',
-    letterSpacing: '8px',
-    margin: '0',
-};
-
-const hr = {
-    borderColor: '#e5e5e5',
-    margin: '20px 0',
-};
-
-const footer = {
-    color: '#666666',
-    fontSize: '14px',
-    lineHeight: '24px',
-    margin: '0 0 4px',
-};
+}

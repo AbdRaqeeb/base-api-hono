@@ -1,24 +1,25 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Preview, Section, Text } from '@react-email/components';
 import { APP_LOGO, APP_NAME } from '../../../constants';
-import { SignInOtpEmailProps } from '../../../types';
+import { VerifyEmailOtpProps } from '../../../types';
 import { styles } from './styles';
 
-export default function SignInOtpEmail({ otp = '123456', otpExpiry = '5 minutes' }: SignInOtpEmailProps) {
+export default function VerifyEmailOtp({ otp = '123456', otpExpiry = '10 minutes' }: VerifyEmailOtpProps) {
     return (
         <Html>
             <Head />
-            <Preview>Your sign in code</Preview>
+            <Preview>Your verification code</Preview>
             <Body style={styles.main}>
                 <Container style={styles.container}>
                     <Img src={APP_LOGO} alt='Company Logo' style={styles.logo} />
                     <Section style={{ padding: '20px 0' }}>
-                        <Heading style={styles.heading}>Sign In Code</Heading>
-                        <Text style={styles.paragraph}>Hi,</Text>
-                        <Text style={styles.paragraph}>Use this code to sign in to your account:</Text>
+                        <Heading style={styles.heading}>Verify Your Email</Heading>
+                        <Text style={styles.paragraph}>
+                            Please use the following code to verify your email address:
+                        </Text>
                         <Text style={styles.otp}>{otp}</Text>
                         <Text style={styles.paragraph}>This code will expire in {otpExpiry}.</Text>
                         <Text style={styles.paragraph}>
-                            If you didn't request this code, please secure your account.
+                            If you didn't request this code, you can safely ignore this email.
                         </Text>
                     </Section>
                     <Hr style={styles.hr} />

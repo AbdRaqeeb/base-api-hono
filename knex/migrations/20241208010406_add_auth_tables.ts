@@ -13,6 +13,12 @@ export async function up(knex: Knex): Promise<void> {
             image              TEXT      NULL,
             first_name         TEXT      NULL,
             last_name          TEXT      NULL,
+            "role"             TEXT      NULL,
+            display_username   TEXT      NULL,
+            two_factor_enabled BOOLEAN   NULL,
+            banned             BOOLEAN   NULL,
+            ban_reason         TEXT      NULL,
+            ban_expires        TIMESTAMP NULL,
             created_at         TIMESTAMP NOT NULL DEFAULT NOW(),
             updated_at         TIMESTAMP NULL
         );
@@ -20,6 +26,7 @@ export async function up(knex: Knex): Promise<void> {
         -- add indexes
         CREATE INDEX IF NOT EXISTS idx_users_email ON ${PUBLIC_SCHEMA}.users (email);
         CREATE INDEX IF NOT EXISTS idx_users_email_verified ON ${PUBLIC_SCHEMA}.users (email_verified);
+        CREATE INDEX IF NOT EXISTS idx_users_username ON ${PUBLIC_SCHEMA}.users (username);
 
         -- add triggers
         DROP TRIGGER IF EXISTS user_set_update_timestamp ON ${PUBLIC_SCHEMA}.users;
@@ -32,14 +39,15 @@ export async function up(knex: Knex): Promise<void> {
 
         CREATE TABLE IF NOT EXISTS ${PUBLIC_SCHEMA}.sessions
         (
-            id         TEXT      NOT NULL PRIMARY KEY,
-            expires_at TIMESTAMP NOT NULL,
-            token      TEXT      NOT NULL UNIQUE,
-            created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-            updated_at TIMESTAMP NULL,
-            ip_address TEXT,
-            user_agent TEXT,
-            user_id    TEXT      NOT NULL REFERENCES ${PUBLIC_SCHEMA}.users (id)
+            id              TEXT      NOT NULL PRIMARY KEY,
+            expires_at      TIMESTAMP NOT NULL,
+            token           TEXT      NOT NULL UNIQUE,
+            created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+            updated_at      TIMESTAMP NULL,
+            ip_address      TEXT      NULL,
+            user_agent      TEXT      NULL,
+            impersonated_by TEXT      NULL,
+            user_id         TEXT      NOT NULL REFERENCES ${PUBLIC_SCHEMA}.users (id)
         );
 
         -- add indexes
@@ -89,7 +97,7 @@ export async function up(knex: Knex): Promise<void> {
         (
             id         TEXT      NOT NULL PRIMARY KEY,
             identifier TEXT      NOT NULL,
-            value      TEXT      NOT NULL,
+            "value"    TEXT      NOT NULL,
             expires_at TIMESTAMP NOT NULL,
             created_at TIMESTAMP NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMP NULL
@@ -116,11 +124,22 @@ export async function up(knex: Knex): Promise<void> {
         );
 
         CREATE INDEX IF NOT EXISTS idx_jwks_public_key ON ${PUBLIC_SCHEMA}.jwks (public_key);
+
+        CREATE TABLE IF NOT EXISTS ${PUBLIC_SCHEMA}.two_factors
+        (
+            id           TEXT NOT NULL PRIMARY KEY,
+            secret       TEXT NOT NULL,
+            backup_codes TEXT NOT NULL,
+            user_id      TEXT NOT NULL REFERENCES ${PUBLIC_SCHEMA}.users ("id")
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_two_factors_user_id ON ${PUBLIC_SCHEMA}.two_factors (user_id);
     `);
 }
 
 export async function down(knex: Knex): Promise<void> {
     await knex.raw(`
+        DROP TABLE IF EXISTS ${PUBLIC_SCHEMA}.two_factors;
         DROP TABLE IF EXISTS ${PUBLIC_SCHEMA}.jwks;
         DROP TABLE IF EXISTS ${PUBLIC_SCHEMA}.verifications;
         DROP TABLE IF EXISTS ${PUBLIC_SCHEMA}.accounts;

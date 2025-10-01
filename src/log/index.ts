@@ -28,7 +28,7 @@ if (Config.nodeEnv === NODE_ENV.PRODUCTION) {
         {
             target: './transports/betterstack',
             options: {
-                endpoint: 'https://in.logs.betterstack.com',
+                endpoint: `https://${Config.liveTailIngestingHost}`,
                 batchSize: 10,
                 interval: 1000,
                 headers: {

@@ -15,6 +15,9 @@ type Router = Hono<Env>;
 export interface Server {
     app: App;
     factory: Factory<Env>;
+    repo: types.Repository;
+    cache: types.CacheService;
+    queue: types.QueueService;
     userService: types.UserService;
     emailService: types.EmailService;
 }

@@ -1,24 +1,26 @@
 import { Body, Container, Head, Heading, Hr, Html, Img, Preview, Section, Text } from '@react-email/components';
 import { APP_LOGO, APP_NAME } from '../../../constants';
-import { SignInOtpEmailProps } from '../../../types';
+import { TwoFactorAuthOtpProps } from '../../../types';
 import { styles } from './styles';
 
-export default function SignInOtpEmail({ otp = '123456', otpExpiry = '5 minutes' }: SignInOtpEmailProps) {
+export default function TwoFactorAuthOtp({ otp = '123456', otpExpiry = '5 minutes' }: TwoFactorAuthOtpProps) {
     return (
         <Html>
             <Head />
-            <Preview>Your sign in code</Preview>
+            <Preview>Your two-factor authentication code</Preview>
             <Body style={styles.main}>
                 <Container style={styles.container}>
                     <Img src={APP_LOGO} alt='Company Logo' style={styles.logo} />
                     <Section style={{ padding: '20px 0' }}>
-                        <Heading style={styles.heading}>Sign In Code</Heading>
+                        <Heading style={styles.heading}>Two-Factor Authentication</Heading>
                         <Text style={styles.paragraph}>Hi,</Text>
-                        <Text style={styles.paragraph}>Use this code to sign in to your account:</Text>
+                        <Text style={styles.paragraph}>
+                            To complete your sign in, please use the following verification code:
+                        </Text>
                         <Text style={styles.otp}>{otp}</Text>
                         <Text style={styles.paragraph}>This code will expire in {otpExpiry}.</Text>
                         <Text style={styles.paragraph}>
-                            If you didn't request this code, please secure your account.
+                            If you didn't request this code, please secure your account immediately.
                         </Text>
                     </Section>
                     <Hr style={styles.hr} />

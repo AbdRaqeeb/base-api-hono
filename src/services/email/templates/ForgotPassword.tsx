@@ -1,92 +1,54 @@
-import { Body, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components';
+import {
+    Body,
+    Button,
+    Container,
+    Head,
+    Heading,
+    Hr,
+    Html,
+    Img,
+    Link,
+    Preview,
+    Section,
+    Text,
+} from '@react-email/components';
+import { APP_LOGO, APP_NAME } from '../../../constants';
 import { ForgotPasswordEmailProps } from '../../../types';
+import { styles } from './styles';
 
-export const ForgotPasswordEmail = ({ otp = '123456', otpExpiry = '10 minutes' }: ForgotPasswordEmailProps) => {
+export default function ForgotPasswordEmail({ url, expiry }: ForgotPasswordEmailProps) {
     return (
         <Html>
             <Head />
-            <Preview>Forgot your password?</Preview>
-            <Body style={main}>
-                <Container style={container}>
-                    <Heading style={h1}>Forgot Your Password?</Heading>
-
-                    <Text style={text}>Hi,</Text>
-                    <Text style={text}>
-                        We received a request to reset your password. Use the OTP below to complete the process:
-                    </Text>
-
-                    <Section style={otpContainer}>
-                        <Text style={otpText}>{otp}</Text>
+            <Preview>Reset your password</Preview>
+            <Body style={styles.main}>
+                <Container style={styles.container}>
+                    <Img src={APP_LOGO} alt='Company Logo' style={styles.logo} />
+                    <Section style={{ padding: '20px 0' }}>
+                        <Heading style={styles.heading}>Reset Your Password</Heading>
+                        <Text style={styles.paragraph}>
+                            We received a request to reset your password. Click the button below to set a new password:
+                        </Text>
+                        <Button href={url} style={styles.button}>
+                            Reset Password
+                        </Button>
+                        <Text style={styles.paragraph}>
+                            If the button above doesn't work, copy and paste this link into your browser:
+                        </Text>
+                        <Link href={url} style={{ color: '#2652bf', display: 'block', marginTop: '8px' }}>
+                            {url}
+                        </Link>
+                        <Text style={styles.paragraph}>
+                            If you didn't request this change, you can safely ignore this email.
+                        </Text>
+                        <Text style={styles.paragraph}>For security, this link will expire in {expiry} minutes.</Text>
                     </Section>
-
-                    <Text style={text}>
-                        This OTP will expire in {otpExpiry}. If you didn't request this password reset, please ignore
-                        this email.
+                    <Hr style={styles.hr} />
+                    <Text style={styles.footer}>
+                        This is an automated message from {APP_NAME}. If you need help, please contact support.
                     </Text>
-
-                    <Hr style={hr} />
-
-                    <Text style={footer}>For security reasons, never share this OTP with anyone.</Text>
-                    <Text style={footer}>If you're having trouble, please contact our support team.</Text>
                 </Container>
             </Body>
         </Html>
     );
-};
-
-export default ForgotPasswordEmail;
-
-const main = {
-    backgroundColor: '#ffffff',
-    fontFamily:
-        '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
-};
-
-const container = {
-    margin: '0 auto',
-    padding: '20px 0 48px',
-    width: '580px',
-};
-
-const h1 = {
-    color: '#1a1a1a',
-    fontSize: '24px',
-    fontWeight: '600',
-    lineHeight: '40px',
-    margin: '0 0 20px',
-};
-
-const text = {
-    color: '#444',
-    fontSize: '16px',
-    lineHeight: '24px',
-    margin: '0 0 10px',
-};
-
-const otpContainer = {
-    background: '#f9fafb',
-    borderRadius: '6px',
-    margin: '24px 0',
-    padding: '24px',
-    textAlign: 'center' as const,
-};
-
-const otpText = {
-    color: '#1a1a1a',
-    fontSize: '32px',
-    fontWeight: '700',
-    letterSpacing: '8px',
-    margin: '0',
-};
-
-const hr = {
-    borderColor: '#e5e5e5',
-    margin: '20px 0',
-};
-
-const footer = {
-    color: '#666666',
-    fontSize: '14px',
-    lineHeight: '24px',
-    margin: '0 0 4px',
-};
+}

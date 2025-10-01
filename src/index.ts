@@ -1,17 +1,22 @@
 import './config';
-import { createNewServer } from './api';
+import { createApplication } from './app';
 import Config from './config';
 import logger from './log';
 import project from './project';
 
+const { server, worker } = createApplication();
+
 export default {
     port: Config.port,
-    fetch: createNewServer().app.fetch,
+    fetch: server.app.fetch,
 };
 
 if (Config.nodeEnv === 'development') {
     logger.info(`${project.name} server is LIVE ⚡️🔥 at port ${Config.port}`);
 }
+
+server.queue.init();
+worker.init();
 
 process.on('uncaughtException', (err: Error) => {
     logger.fatal(err, '[UncaughtException] - Shutting down server...');
