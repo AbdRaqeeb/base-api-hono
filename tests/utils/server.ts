@@ -1,4 +1,4 @@
-import { createNewServer } from '../../src/api';
+import { createApplication } from '../../src/app';
 import { UnknownObject } from '../../src/types';
 
 interface RequestParams {
@@ -10,7 +10,7 @@ interface RequestParams {
 }
 
 function buildTestServer() {
-    const { app } = createNewServer();
+    const { app } = createApplication();
 
     async function request({ method, url, body, token, customHeaders }: RequestParams) {
         const headerParams: UnknownObject = {
