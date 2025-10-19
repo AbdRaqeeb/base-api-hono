@@ -119,7 +119,7 @@ export const auth = betterAuth({
         twoFactor({
             issuer: project.appName,
             otpOptions: { sendOTP: betterAuthEmails.sendTwoFactorAuthEmail },
-            schema: { user: schema.twoFactor.user, twoFactor: schema.twoFactor.core },
+            schema: { ...(schema.twoFactor || {}) },
         }),
         admin({
             adminRoles: ['admin', 'super-admin'],

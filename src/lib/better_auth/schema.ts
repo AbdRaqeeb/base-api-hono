@@ -69,19 +69,16 @@ export const schema = {
     },
     twoFactor: {
         user: {
-            modelName: 'two_factors',
             fields: {
                 twoFactorEnabled: 'two_factor_enabled',
-                backupCodes: 'backup_codes',
                 userId: 'user_id',
             },
         },
-        core: {
+        twoFactor: {
             modelName: 'two_factors',
             fields: {
                 backupCodes: 'backup_codes',
                 userId: 'user_id',
-                twoFactorEnabled: 'two_factor_enabled',
             },
         },
     },
