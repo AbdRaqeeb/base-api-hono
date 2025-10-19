@@ -1,0 +1,1 @@
+alter table "accounts" add column "refresh_token_expires_at" timestamptz;
